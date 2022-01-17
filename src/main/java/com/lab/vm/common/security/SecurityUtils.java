@@ -37,7 +37,7 @@ public class SecurityUtils {
             username = (String) authentication.getPrincipal();
         }
 
-        LOG.debug("found username '{}' in security context", username);
+        LOG.info("found username '{}' in security context", username);
 
         return Optional.ofNullable(username);
     }

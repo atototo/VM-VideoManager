@@ -2,6 +2,7 @@ package com.lab.vm.model.domain;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
@@ -9,9 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "USER")
@@ -60,6 +59,14 @@ public class User implements Serializable {
             inverseJoinColumns = {@JoinColumn(name = "AUTHORITY_NAME", referencedColumnName = "NAME")})
     @BatchSize(size = 20)
     private Set<Authority> authorities = new HashSet<>();
+
+
+    @JsonManagedReference
+    @OneToMany(mappedBy ="user", fetch = FetchType.LAZY)
+    @BatchSize(size = 20)
+    private List<Video> videos = new ArrayList<>();
+
+
 
     @Override
     public boolean equals(Object o) {

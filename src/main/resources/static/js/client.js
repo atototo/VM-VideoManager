@@ -259,6 +259,36 @@ $(function () {
       });
    });
 
+   $("#btn_upload").click(function () {
+      var formData = new FormData();
+      var inputFile = $("input[name='upload_file']");
+      console.log(inputFile);
+      // var file = inputFile[0].files;
+      formData.append('key1', 'value1');
+      formData.append('key2', 'value2');
+
+      // for(var i=0; i <files.length;i++) {
+         formData.append('file', $("input[name=upload_file]")[0].files[0])
+
+      // }
+      console.log(formData);
+      $.ajax({
+         url: "/api/file-upload",
+         type: "POST",
+         data: formData,
+         contentType: false,
+         processData: false,
+         headers: createAuthorizationTokenHeader(),
+         success: function (data, textStatus, jqXHR) {
+            console.log(data);
+            alert('성공?');
+         }, error: function (jqXHR, textStatus, errorThrown) {
+            showResponse(jqXHR.status, jqXHR.responseJSON.message)
+         }
+      });
+
+   })
+
    $loggedIn.click(function () {
       $loggedIn
          .toggleClass("text-hidden")
