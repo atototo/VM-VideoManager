@@ -307,6 +307,5 @@ $(function () {
       showTokenInformation();
       showUserInformation();
    }
+
 });
-
-
