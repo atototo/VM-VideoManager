@@ -12,6 +12,7 @@ $(function () {
    var $inputUserName = $("#inputUserName");
    var $inputUserEmail = $("#inputUserEmail");
    var $userInfo = $("#userInfo").hide();
+   var $videoInfo = $("#userInfo");
 
    // FUNCTIONS =============================================================
    function getJwtToken() {
@@ -84,6 +85,9 @@ $(function () {
       }
    }
 
+   /**
+    * 사용자 정보 비디오 목록 조회
+    */
    function showUserInformation() {
       $.ajax({
          url: "/api/user",
@@ -96,7 +100,7 @@ $(function () {
 
             $userInfoBody.append($("<div>").text("Username: " + data.username));
             $userInfoBody.append($("<div>").text("Phone: " + data.phone));
-            $userInfoBody.append($("<div>").text("Email: " + data.email));
+            $userInfoBody.append($("<div>").text("Email: " + data.email)).attr("onclick","showVideo();");
 
             var $authorityList = $("<ul>");
             data.authorities.forEach(function (authorityItem) {
@@ -107,11 +111,53 @@ $(function () {
 
             $userInfoBody.append($authorities);
             $userInfo.show();
+
+
+            console.log(data.videos);
+
+            let insertTr = ""; // 변수 선언
+           data.videos.forEach(function (videoItem) {
+              console.log(videoItem);
+              // 동적으로 리스트 추가
+              var videoId ="video_"+data.username+"_" +videoItem.id;
+              // insertTr += "<tr onclick='showVideo("+videoItem.id+", "+data.username+")' style='cursor:pointer;'>"; // body 에 남겨둔 예시처럼 데이터 삽입
+              insertTr += "<tr id='"+videoId+"' style='cursor:pointer;'>"; // body 에 남겨둔 예시처럼 데이터 삽입
+              insertTr += "<td>" + videoItem.name + "</td>"; // body 에 남겨둔 예시처럼 데이터 삽입
+              insertTr += "<td>" + videoItem.uploadDate+ "</td>";
+              insertTr += "</tr>";
+
+            });
+              $("#responseVideoList").append(insertTr);
+
             console.log("내 정보 조회 값 확인 : " + JSON.stringify(data));
             showModifyInformation(data);
          }
       });
    }
+
+   //사용자 선택에 따라 재생 동영상을 불러 옴
+   function movieDialog(str) {
+      //선택한 버튼의 동영상 경로를 불러옴
+      $("#movie_src").attr("src", $(str).attr("value"));
+      //동영상을 다시 load 함
+      $("#a_video").load();
+      //load한 동영상을 재생
+      document.getElementById("a_video").play();
+   };
+
+   function showVideo() {
+      console.log("Qkrkaf gaeiogfikdafvdgaerkngflkenfknsdklfnsdkfnlwenfewl");
+   }
+
+   $("#video_user_1").click(function () {
+      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+   })
+
+
+   $("input[id^='video_']").click(function () {
+      console.log("테이블 로우클릭??   ")
+
+   });
 
    /**
     * 내 정보 수정 모달 데이터 세팅
@@ -141,6 +187,8 @@ $(function () {
             + (typeof message === "object" ? JSON.stringify(message) : message)
          );
    }
+
+
 
    // REGISTER EVENT LISTENERS =============================================================
    $("#loginForm").submit(function (event) {
