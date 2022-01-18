@@ -12,6 +12,8 @@
    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
          integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
 
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.8.1/video-js.min.css" rel="stylesheet">
+
    <style type="text/css">
       .text-hidden {
          text-overflow: ellipsis;
@@ -114,8 +116,18 @@
          </div>
          <div class="panel-body">
             <div id="videoInfoBody">
-               <video id="a_video" width="320" height="240" controls="controls">
-                  <source id="movie_src" type="video/mp4" src="" />
+<!--               <video id="a_video" width="320" height="240" controls="controls">-->
+<!--                  <source id="movie_src" type="video/mp4" src="" />-->
+<!--               </video>-->
+               <video
+                       id="my_video"
+                       class="video-js"
+                       controls
+                       preload="auto"
+                       width="640"
+                       height="268"
+                       data-setup="{}"
+               >
                </video>
             </div>
          </div>
@@ -131,6 +143,7 @@
             <tr>
                <th scope="col" onclick='showVideo(name, id)'>제목</th>
                <th scope="col">업로드 일자</th>
+               <th scope="col">재생</th>
             </tr>
             </thead>
             <tbody id="responseVideoList">
@@ -248,6 +261,8 @@
       </div>
    </form>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/7.8.1/video.min.js"></script>
 
 <script src="https://code.jquery.com/jquery-2.2.2.js" integrity="sha256-4/zUCqiq0kqxhZIyp4G0Gk+AOtCJsY1TA00k5ClsZYE="
         crossorigin="anonymous"></script>

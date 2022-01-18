@@ -89,6 +89,11 @@ $(function () {
     * 사용자 정보 비디오 목록 조회
     */
    function showUserInformation() {
+
+      $userInfo
+          .hide()
+          .find("#userInfoBody").empty();
+
       $.ajax({
          url: "/api/user",
          type: "GET",
@@ -114,25 +119,61 @@ $(function () {
 
 
             console.log(data.videos);
-
-            let insertTr = ""; // 변수 선언
-           data.videos.forEach(function (videoItem) {
-              console.log(videoItem);
-              // 동적으로 리스트 추가
-              var videoId ="video_"+data.username+"_" +videoItem.id;
-              // insertTr += "<tr onclick='showVideo("+videoItem.id+", "+data.username+")' style='cursor:pointer;'>"; // body 에 남겨둔 예시처럼 데이터 삽입
-              insertTr += "<tr id='"+videoId+"' style='cursor:pointer;'>"; // body 에 남겨둔 예시처럼 데이터 삽입
-              insertTr += "<td>" + videoItem.name + "</td>"; // body 에 남겨둔 예시처럼 데이터 삽입
-              insertTr += "<td>" + videoItem.uploadDate+ "</td>";
-              insertTr += "</tr>";
-
-            });
-              $("#responseVideoList").append(insertTr);
+            showVideoList(data);
+           //  let insertTr = ""; // 변수 선언
+           // data.videos.forEach(function (videoItem) {
+           //    console.log(videoItem);
+           //    // 동적으로 리스트 추가
+           //    var videoId ="video_"+data.username+"_" +videoItem.id;
+           //    // insertTr += "<tr onclick='showVideo("+videoItem.id+", "+data.username+")' style='cursor:pointer;'>"; // body 에 남겨둔 예시처럼 데이터 삽입
+           //    insertTr += "<tr>"; // body 에 남겨둔 예시처럼 데이터 삽입
+           //       insertTr += "<td>" + videoItem.name + "</td>"; // body 에 남겨둔 예시처럼 데이터 삽입
+           //       insertTr += "<td>" + videoItem.uploadDate+ "</td>";
+           //       insertTr += "<td>";
+           //          insertTr += '<button type="button" onclick="showVideo('+videoItem.id+');">재생</button>';
+           //       insertTr += "</td>";
+           //    insertTr += "</tr>";
+           //
+           //  });
+           //    $("#responseVideoList").html(insertTr);
 
             console.log("내 정보 조회 값 확인 : " + JSON.stringify(data));
             showModifyInformation(data);
          }
       });
+   }
+
+   function showVideoList(data){
+
+      // var col=document.getElementById('responseVideoList');
+
+      let insertTr = ""; // 변수 선언
+      data.videos.forEach(function (videoItem) {
+         console.log(videoItem);
+         // 동적으로 리스트 추가
+         var videoId ="video_"+data.username+"_" +videoItem.id;
+         // insertTr += "<tr onclick='showVideo("+videoItem.id+", "+data.username+")' style='cursor:pointer;'>"; // body 에 남겨둔 예시처럼 데이터 삽입
+         insertTr += "<tr>"; // body 에 남겨둔 예시처럼 데이터 삽입
+         insertTr += "<td>" + videoItem.name + "</td>"; // body 에 남겨둔 예시처럼 데이터 삽입
+         insertTr += "<td>" + videoItem.uploadDate+ "</td>";
+         insertTr += "<td>";
+         insertTr += '<button type="button" id='+videoId+'>재생</button>';
+         insertTr += "</td>";
+         insertTr += "</tr>";
+         //두 번째 버튼 이벤트
+         $(document).on("click", "#"+videoId, function() {
+            showVideo(videoId, videoItem.name);
+         });
+
+      });
+      // col.innerHTML=insertTr;
+
+
+
+
+
+
+      $("#responseVideoList").html(insertTr);
    }
 
    //사용자 선택에 따라 재생 동영상을 불러 옴
@@ -143,10 +184,33 @@ $(function () {
       $("#a_video").load();
       //load한 동영상을 재생
       document.getElementById("a_video").play();
-   };
+   }
 
-   function showVideo() {
-      console.log("Qkrkaf gaeiogfikdafvdgaerkngflkenfknsdklfnsdkfnlwenfewl");
+   function showVideo(id, name) {
+      videojs.Hls.xhr.beforeRequest = function(options) {
+         console.log("토큰 정보 해야대 들어와써???????");
+         options.headers = options.headers || {};
+         options.headers.Authorization = getJwtToken();
+         options.uri = options.uri + "?Authorization="+getJwtToken();
+         console.log('options', options)
+         return options;
+      };
+
+      var player = videojs('my_video');
+      player.ready(function() {
+         this.src({
+            src: "/video-stream/"+name,
+            // headers: createAuthorizationTokenHeader(),
+            type : "video/mp4"
+         });
+
+      });
+
+      // var
+      // video = $('#videoInfoBody video')[0];
+      // video.src = "/video-stream/"+name;
+      // video.load();
+      // video.play();
    }
 
    $("#video_user_1").click(function () {
@@ -330,6 +394,7 @@ $(function () {
          success: function (data, textStatus, jqXHR) {
             console.log(data);
             alert('성공?');
+            showUserInformation();
          }, error: function (jqXHR, textStatus, errorThrown) {
             showResponse(jqXHR.status, jqXHR.responseJSON.message)
          }
