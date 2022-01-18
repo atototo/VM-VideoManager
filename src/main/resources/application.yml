@@ -8,23 +8,31 @@ spring:
     serialization:
       INDENT_OUTPUT: true
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+#    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create-drop
-  h2:
-    console:
+      ddl-auto: none
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    url: jdbc:mariadb://34.64.196.39:3306/video-manage?characterEncoding=UTF-8&serverTimezone=UTC;MVCC=TRUE
+    username: root
+    password: 1234
+
+#  h2:
+#    console:
       # URL: jdbc:h2:mem:testdb
-      enabled: true
+#      enabled: true
   devtools:
     restart:
       enabled: true
 
-  datasource:
-    hikari:
-      jdbc-url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-      driver-class-name: org.h2.Driver
-      username: sa
-      password:
+#  datasource:
+#    hikari:
+#      jdbc-url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+#      driver-class-name: org.h2.Driver
+#      username: sa
+#      password:
+
+
   servlet:
     multipart:
       max-request-size: 100MB

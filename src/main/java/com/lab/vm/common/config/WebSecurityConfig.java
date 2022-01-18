@@ -100,6 +100,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 // .antMatchers("/api/account/reset-password/finish").permitAll()
 
                 .antMatchers("/api/person").hasAuthority("ROLE_USER")
+                .antMatchers("/api/file-upload").hasAuthority("ROLE_UPLOAD")
                 .antMatchers("/api/hiddenmessage").hasAuthority("ROLE_ADMIN")
 
                 .anyRequest().authenticated()

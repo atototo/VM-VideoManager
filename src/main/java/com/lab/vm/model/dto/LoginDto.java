@@ -17,6 +17,8 @@ import java.io.Serializable;
 @ToString
 public class LoginDto implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @NotNull
     @Size(min = 1, max = 50)
     private String username;

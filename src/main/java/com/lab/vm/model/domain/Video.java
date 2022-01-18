@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name="VIDEOS")
+@Table(name="videos")
 @Getter
 @Setter
 @Builder
@@ -16,24 +16,26 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Video implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue
-    @Column(name ="VIDEO_ID")
+    @Column(name ="video_id")
     private Long id;
 
-    @Column(name="VIDEO_NAME")
+    @Column(name="video_name")
     private String name;
 
-    @Column(name="VIDEO_SIZE")
+    @Column(name="video_size")
     private Long size;
 
     @JsonBackReference
     @ManyToOne
-    @JoinColumn(name="USER_ID")
+    @JoinColumn(name="user_id")
     private User user;         //연관관계의 주인
 
 
-    @Column(name="UPLOAD_DATE")
+    @Column(name="upload_date")
     private LocalDateTime uploadDate;   // 하이버네이트가 알아서 포맷 지원
 
 

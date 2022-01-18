@@ -30,18 +30,20 @@
 <div class="container">
    <h1>VM - Video Manager</h1>
 
-   <div class="alert alert-danger" id="notLoggedIn">Not logged in!</div>
+<!--   <div class="alert alert-danger" id="notLoggedIn">Not logged in!</div>-->
 
-   <div class="alert alert-info text-hidden" id="loggedIn"></div>
+<!--   <div class="alert alert-info text-hidden" id="loggedIn"></div>-->
 
    <div class="row">
       <div class="col-md-6">
          <div class="panel panel-default" id="login">
-            <div class="panel-heading">
-               <h3 class="panel-title">Login</h3>
-            </div>
-            <div class="panel-body">
-               <form id="loginForm">
+            <form id="loginForm">
+               <div class="panel-heading">
+                  <h3 class="panel-title">Login
+                     <button type="submit" class="btn btn-default">login</button>
+                  </h3>
+               </div>
+               <div class="panel-body">
                   <div class="form-group">
                      <input type="text" class="form-control" id="inputUserName" placeholder="username"
                             required name="username">
@@ -58,9 +60,8 @@
                         <li>disabled & password</li>
                      </ul>
                   </div>
-                  <button type="submit" class="btn btn-default">login</button>
-               </form>
-            </div>
+               </div>
+            </form>
          </div>
 
          <div id="userInfo">
@@ -76,17 +77,14 @@
                </div>
             </div>
          </div>
-
-
-
       </div>
 
       <div class="col-md-6">
          <div class="btn-group" role="group" aria-label="..." style="margin-bottom: 16px;">
-            <button type="button" class="btn btn-default" id="exampleServiceBtn">call example service</button>
-            <button type="button" class="btn btn-default" id="adminServiceBtn">call admin protected service</button>
-            <button type="button" class="btn btn-default" id="streamingVideoBtn"  onClick="movieDialog(this)" value="sample_2.mp4">비디오 스트리밍</button>
+<!--            <button type="button" class="btn btn-default" id="exampleServiceBtn">call example service</button>-->
+<!--            <button type="button" class="btn btn-default" id="adminServiceBtn">call admin protected service</button>-->
             <button type="button" class="btn btn-default" id="registerBtn">회원 등록</button>
+            <button type="button" class="btn btn-default" id="deleteBtn" style="display: none;">회원 탈퇴</button>
             <button type="button" class="btn btn-default" id="modifyBtn" style="display: none;">내 정보 수정</button>
          </div>
          <div class="panel panel-default">
@@ -97,7 +95,7 @@
                <pre id="response"></pre>
             </div>
          </div>
-         <div class="panel panel-default">
+         <div class="panel panel-default" id="fileUploadInfo" style="display: none;">
             <div class="panel-heading">
                <h3 class="panel-title">파일 업로드</h3>
             </div>
@@ -109,7 +107,8 @@
       </div>
    </div>
    <!-- 비디오 송출 되는 곳-->
-   <div id="videoInfo">
+   <div id="videoInfo" style="display: none;">
+
       <div class="panel panel-default">
          <div class="panel-heading">
             <h3 class="panel-title">Video Streaming</h3>
@@ -174,7 +173,7 @@
 
 
 <!-- 회원 등록 모달 시작 -->
-<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true">
+<div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true"  data-backdrop="static" data-keyboard="false">
    <form name="registerForm" role="form" action="/api/register" method="post">
 <!--      <input type="hidden" id="registerId">-->
       <div class="modal-dialog" role="document">
@@ -194,10 +193,10 @@
                      <label for="registerUserPassword" class="col-form-label">비밀번호:</label>
                      <input type="password" class="form-control" id="registerUserPassword" name="password">
                   </div>
-<!--                  <div class="form-group">-->
-<!--                     <label for="registerUserPasswordConfirm" class="col-form-label">비밀번호 확인:</label>-->
-<!--                     <input type="text" class="form-control" id="registerUserPasswordConfirm" name="passwordConfirm">-->
-<!--                  </div>-->
+                  <div class="form-group">
+                     <label for="registerUserPasswordConfirm" class="col-form-label">비밀번호 확인:</label>
+                     <input type="password" class="form-control" id="registerUserPasswordConfirm" name="passwordConfirm">
+                  </div>
                   <div class="form-group">
                      <label for="registerUserEmail" class="col-form-label">email:</label>
                      <input type="text" class="form-control" id="registerUserEmail" name="email">
@@ -220,7 +219,7 @@
 
 
 <!-- 회원 정보 수정 모달 시작 -->
-<div class="modal fade" id="modifyUserModal" tabindex="-1" role="dialog" aria-labelledby="modifyUserModalLabel" aria-hidden="true">
+<div class="modal fade" id="modifyUserModal" tabindex="-1" role="dialog" aria-labelledby="modifyUserModalLabel" aria-hidden="true"  data-backdrop="static" data-keyboard="false">
    <form name="modifyUserForm" >
             <input type="hidden" id="modifyUserId" name="id">
       <div class="modal-dialog" role="document">
@@ -240,10 +239,10 @@
                   <label for="registerUserPassword" class="col-form-label">비밀번호:</label>
                   <input type="password" class="form-control" id="modifyUserPassword" name="password">
                </div>
-               <!--                  <div class="form-group">-->
-               <!--                     <label for="registerUserPasswordConfirm" class="col-form-label">비밀번호 확인:</label>-->
-               <!--                     <input type="text" class="form-control" id="registerUserPasswordConfirm" name="passwordConfirm">-->
-               <!--                  </div>-->
+               <div class="form-group">
+                  <label for="modifyUserPasswordConfirm" class="col-form-label">비밀번호 확인:</label>
+                  <input type="password" class="form-control" id="modifyUserPasswordConfirm" name="passwordConfirm">
+               </div>
                <div class="form-group">
                   <label for="registerUserEmail" class="col-form-label">email:</label>
                   <input type="text" class="form-control" id="modifyUserEmail" name="email">
@@ -256,6 +255,36 @@
             <div class="modal-footer">
                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                <button type="button" class="btn btn-primary"id="modifyUserBtn">회원정보 등록</button>
+            </div>
+         </div>
+      </div>
+   </form>
+</div>
+
+<!-- 회원 정보 수정 모달 시작 -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="modifyUserModalLabel" aria-hidden="true"  data-backdrop="static" data-keyboard="false">
+   <form name="modifyUserForm" >
+            <input type="hidden" id="deleteUserId" name="id">
+      <div class="modal-dialog" role="document">
+         <div class="modal-content">
+            <div class="modal-header">
+               <h5 class="modal-title" id="deleteUserModalLabel">회원 탈퇴 확인</h5>
+               <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+               </button>
+            </div>
+            <div class="modal-body">
+               <div class="form-group">
+                  <label for="deleteUserName" class="col-form-label">이름:</label>
+                  <input type="text" class="form-control" id="deleteUserName" name="username" readonly>
+               </div>
+               <div class="form-group">
+                  <label for="deleteUserPassword" class="col-form-label">비밀번호:</label>
+                  <input type="password" class="form-control" id="deleteUserPassword" name="password">
+               </div>
+            <div class="modal-footer">
+               <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+               <button type="button" class="btn btn-primary"id="deleteUserBtn">회원정보 등록</button>
             </div>
          </div>
       </div>

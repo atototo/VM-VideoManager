@@ -1,4 +1,4 @@
-package com.lab.vm.common.security;
+package com.lab.vm.common.exception;
 
 import org.springframework.security.core.AuthenticationException;
 

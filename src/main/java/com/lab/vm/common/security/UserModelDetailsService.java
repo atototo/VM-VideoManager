@@ -1,6 +1,7 @@
 package com.lab.vm.common.security;
 
 
+import com.lab.vm.common.exception.UserNotActivatedException;
 import com.lab.vm.model.domain.User;
 import com.lab.vm.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;

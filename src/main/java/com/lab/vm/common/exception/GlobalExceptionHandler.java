@@ -1,0 +1,76 @@
+package com.lab.vm.common.exception;
+
+import com.lab.vm.model.vo.ApiResponseMessage;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import javax.servlet.http.HttpServletRequest;
+
+/**
+ * packageName : com.lab.vm.common.exception
+ * fileName : GlobalExceptionHandler
+ * author : isbn8
+ * date : 2022-01-18
+ * description :
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              isbn8             최초 생성
+ */
+
+@Slf4j
+@RequiredArgsConstructor
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    /**
+     * 입력값 validation Exception
+     * @param e
+     * @param request
+     * @return
+     */
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ApiResponseMessage> methodValidException(MethodArgumentNotValidException e, HttpServletRequest request) {
+        log.info("MethodArgumentNotValidException 발생!!! url:{}, trace:{}", request.getRequestURI(), e.getStackTrace());
+        ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.BAD_REQUEST,e.getBindingResult().getAllErrors().get(0).getDefaultMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+
+    /**
+     * 기존 회원 여부 확인 Exception
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(UserAlreadyExistException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiResponseMessage>  userAlreadyExistException(UserAlreadyExistException ex) {
+        ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.BAD_REQUEST, ex.getMessage());
+        log.info("UserAlreadyExistException 발생!! {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 유저 거부 Exception
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiResponseMessage>  userAccessDeniedException(AccessDeniedException ex) {
+        ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.FORBIDDEN, "접근 권한이 없습니다");
+        log.info("AccessDeniedException 발생!! {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
+
+
+
+}

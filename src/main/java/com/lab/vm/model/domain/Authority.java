@@ -15,15 +15,17 @@ import java.io.Serializable;
 import java.util.Objects;
 
 @Entity
-@Table(name = "AUTHORITY")
+@Table(name = "authority")
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
 public class Authority  implements Serializable {
 
+    private static final long serialVersionUID = 1L;
+
     @Id
-    @Column(name = "NAME", length = 50)
+    @Column(name = "name", length = 50)
     @NotNull
     private String name;
 
