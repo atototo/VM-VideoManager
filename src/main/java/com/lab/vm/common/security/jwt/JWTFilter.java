@@ -1,5 +1,6 @@
 package com.lab.vm.common.security.jwt;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
@@ -19,9 +20,9 @@ import java.io.IOException;
  * Filters incoming requests and installs a Spring Security principal if a header corresponding to a valid user is
  * found.
  */
+@Slf4j
 public class JWTFilter extends GenericFilterBean {
 
-    private static final Logger LOG = LoggerFactory.getLogger(JWTFilter.class);
 
     public static final String AUTHORIZATION_HEADER = "Authorization";
 
@@ -38,12 +39,13 @@ public class JWTFilter extends GenericFilterBean {
         String jwt = resolveToken(httpServletRequest);
         String requestURI = httpServletRequest.getRequestURI();
 
+        //토큰 유무와 유효성 검증
         if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
             Authentication authentication = tokenProvider.getAuthentication(jwt);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            LOG.debug("set Authentication to security context for '{}', uri: {}", authentication.getName(), requestURI);
+            log.debug("set Authentication to security context for '{}', uri: {}", authentication.getName(), requestURI);
         } else {
-            LOG.debug("no valid JWT token found, uri: {}", requestURI);
+            log.debug("토큰 정보가 없습니다, 요청 uri: {}", requestURI);
         }
 
         filterChain.doFilter(servletRequest, servletResponse);

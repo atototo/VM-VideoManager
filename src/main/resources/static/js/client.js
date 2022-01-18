@@ -386,7 +386,7 @@ $(function () {
          success: function (data, textStatus, jqXHR) {
             console.log(data);
              alert("회원 정보 수정에 성공하였습니다.");
-               setJwtToken(data.id_token);
+            setJwtToken(data.id_token);
                 $modifyUserModal
                   .modal("hide")
                   .find("#modifyUserModal").empty();

@@ -3,6 +3,7 @@ package com.lab.vm.model.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.lab.vm.model.dto.RegisterDto;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
@@ -19,6 +20,26 @@ import java.util.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+
+@SqlResultSetMapping(
+        name = "register_dto",
+        classes = @ConstructorResult(
+                targetClass = RegisterDto.class,
+                columns = {
+                        @ColumnResult(name = "id", type = Long.class),
+                        @ColumnResult(name = "password", type = String.class),
+//                        @ColumnResult(name = "username", type = String.class),
+//                        @ColumnResult(name = "email", type = String.class),
+//                        @ColumnResult(name = "phone", type = String.class)
+                }
+        )
+)
+@NamedNativeQuery(
+        name = "find_user_by_name_dto",
+        query ="select m.id AS id, m.password AS password from user m where m.username = :username",
+//        query ="select m.id AS id, m.password AS password, m.username AS username,m.email AS email, m.phone AS phone from user m where m.username = :username",
+        resultSetMapping = "register_dto"
+)
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -32,7 +53,7 @@ public class User implements Serializable {
 
     @Column(name = "username", length = 50, unique = true)
     @NotNull
-    @Size(min = 4, max = 50)
+    @Size(min = 3, max = 50)
     private String username;
 
     @JsonIgnore
@@ -60,12 +81,14 @@ public class User implements Serializable {
             joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name = "authority_name", referencedColumnName = "name")})
     @BatchSize(size = 20)
+    @Builder.Default
     private Set<Authority> authorities = new HashSet<>();
 
 
     @JsonManagedReference
     @OneToMany(mappedBy ="user", fetch = FetchType.LAZY)
     @BatchSize(size = 20)
+    @Builder.Default
     private List<Video> videos = new ArrayList<>();
 
 

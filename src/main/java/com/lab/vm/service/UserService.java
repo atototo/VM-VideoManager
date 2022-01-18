@@ -1,17 +1,30 @@
 package com.lab.vm.service;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lab.vm.common.exception.PasswordConfirmFailedException;
 import com.lab.vm.common.exception.UserAlreadyExistException;
 import com.lab.vm.common.security.SecurityUtils;
+import com.lab.vm.common.security.jwt.JWTFilter;
+import com.lab.vm.common.security.jwt.TokenProvider;
+import com.lab.vm.controller.AuthenticationRestController;
 import com.lab.vm.model.domain.Authority;
+import com.lab.vm.model.domain.RefreshToken;
 import com.lab.vm.model.domain.User;
 import com.lab.vm.model.dto.RegisterDto;
+import com.lab.vm.model.dto.TokenDto;
 import com.lab.vm.model.vo.ApiResponseMessage;
+import com.lab.vm.repository.RefreshTokenRepository;
 import com.lab.vm.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +38,17 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final TokenProvider tokenProvider;
+
 
 
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {
 
-        Optional<User> user = SecurityUtils.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername);
+        Optional<User> user = SecurityUtils.getCurrentUsername().
+                flatMap(userRepository::findOneWithAuthoritiesByUsername);
         log.info("[사용자 정보 확인 ] :: {}", user.toString());
 
         return user;
@@ -38,10 +56,12 @@ public class UserService {
 
 
     /**
-     * 사용자 입력 정보 검증 및 등록
-     * @param registerDto
-     * @return
+     * Register user api response message.
+     * 정보검증부터 사용자 등록
+     * @param registerDto the register dto
+     * @return the api response message
      */
+    @Transactional
     public ApiResponseMessage registerUser(RegisterDto registerDto) {
 
         //기존 회원 여부 확인 ->  Exception 보내기
@@ -62,9 +82,10 @@ public class UserService {
     }
 
     /**
-     * 검증 통과 된 사용자 정보 회원 등록
-     * @param registerDto
-     * @return
+     * User join optional.
+     * 사용자 등록
+     * @param registerDto the register dto
+     * @return the optional
      */
     public Optional<User> userJoin(RegisterDto registerDto) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
@@ -95,51 +116,69 @@ public class UserService {
 
 
     /**
-     * 사용자 입력 정보 검증 및 등록
-     * @param registerDto
-     * @return
+     * User modify token dto.
+     * 사용자 정보 업데이트
+     * @param registerDto the register dto
+     * @return the token dto
      */
     @Transactional
-    public ApiResponseMessage modifyUser(RegisterDto registerDto) {
+    public TokenDto userModify(RegisterDto registerDto){
 
+        //비밀번호 재확인 검증
         chkPasswordConfirm(registerDto);
 
-        var user = userModify(registerDto);
-
-        var apiResponse = new ApiResponseMessage(HttpStatus.BAD_REQUEST.value(), "회원 정보 수정에 실패하였습니다");
-
-        if (user.isPresent()){
-            apiResponse = new ApiResponseMessage(HttpStatus.OK.value(), "회원 정보 수정에 성공하였습니다");
-
-        }
-
-        return  apiResponse;
-    }
-
-
-    /**
-     * 회원정보 수정
-     * @param registerDto
-     * @return
-     */
-    public Optional<User> userModify(RegisterDto registerDto){
+        //비밀번호 암호화
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
 
+        //기존정보 조회
         var user = userRepository.findAllByUsername(registerDto.getUsername());
+        //새로운 정보로 저장
         user.ifPresent(selectUser ->{
             selectUser.setPassword(bCryptPasswordEncoder.encode(registerDto.getPassword()));
             selectUser.setPhone(registerDto.getPhone());
             selectUser.setEmail(registerDto.getEmail());
             userRepository.save(selectUser);
         });
-        return user;
+
+        //비밀번호 변경 가능성 -> 토큰 정보 업데이트 후 리턴
+        return updateUserToken(registerDto.getUsername(), registerDto.getPassword());
     }
 
 
+    /**
+     * Update user token token dto.
+     * 토큰 정보 업데이트
+     * @param username the username
+     * @param password the password
+     * @return the token dto
+     */
+    public TokenDto updateUserToken(String username, String password) {
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(username, password);
+
+        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        //  accessToken refreshToken 생성
+        var tokenDto = tokenProvider.createToken(authentication);
+
+        // RefreshToken 업데이트
+        var refreshToken = refreshTokenRepository.findByKey(username);
+
+        //새로운 정보로 저장
+        refreshToken.ifPresent(selectToken ->{
+          selectToken.setToken(tokenDto.getRefreshToken());
+            refreshTokenRepository.save(selectToken);
+        });
+
+        return tokenDto;
+    }
+
 
     /**
-     * 중복사용자 검증
-     * @param registerDto
+     * chkValidateExistUser
+     * 기존 회원 여부 확인
+     * @param RegisterDto registerDto
      */
     private void chkValidateExistUser(RegisterDto registerDto) {
 
@@ -152,8 +191,9 @@ public class UserService {
     }
 
     /**
-     * 비밀번호 재확인 검증
-     * @param registerDto
+     * chkPasswordConfirm
+     * 비밀번호 입력 검증
+     * @param RegisterDto registerDto
      */
     private void chkPasswordConfirm(RegisterDto registerDto) {
         //  비밀번호 입력 검증
@@ -162,5 +202,22 @@ public class UserService {
         }
     }
 
+
+    /**
+     * Is same ori pwd with enc pwd boolean.
+     *
+     * @param oriPassword the ori password
+     * @param encPassword the enc password
+     * @return the boolean
+     */
+    public boolean isSameOriPwdWithEncPwd(String oriPassword, String encPassword){
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        return bCryptPasswordEncoder.matches(oriPassword, encPassword);
+    }
+
+
+    public Optional<RegisterDto> findUserInfoByName(String userName) {
+        return userRepository.findUserInfoByName(userName);
+    }
 
 }

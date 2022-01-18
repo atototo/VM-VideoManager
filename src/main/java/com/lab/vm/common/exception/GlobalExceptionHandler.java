@@ -18,13 +18,12 @@ import javax.servlet.http.HttpServletRequest;
  * fileName : GlobalExceptionHandler
  * author : isbn8
  * date : 2022-01-18
- * description :
+ * description : 예외 공통 처리
  * ===========================================================
  * DATE                  AUTHOR                  NOTE
  * -----------------------------------------------------------
  * 2022-01-18              isbn8             최초 생성
  */
-
 @Slf4j
 @RequiredArgsConstructor
 @RestControllerAdvice
