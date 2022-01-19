@@ -57,7 +57,11 @@ public class UserService {
     private final VideoRepository videoRepository;
 
 
-
+    /**
+     * Gets user with authorities.
+     * 사용자, 권한 정보 조회
+     * @return the user with authorities
+     */
     @Transactional(readOnly = true)
     public Optional<User> getUserWithAuthorities() {
 

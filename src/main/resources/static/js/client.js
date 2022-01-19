@@ -1,13 +1,8 @@
-/**
- * Created by stephan on 20.03.16.
- */
 
 $(function () {
-   // VARIABLES =============================================================
+   //공통 사용 변수 정의
    const TOKEN_ACCESS_KEY = "jwtAccessToken";
    const TOKEN_REFRESH_KEY = "jwtRefreshToken";
-   const $notLoggedIn = $("#notLoggedIn");
-   const $loggedIn = $("#loggedIn").hide();
    const $registerBtn = $('#registerBtn');
    const $modifyBtn = $(`#modifyBtn`);
    const $modifyUserModal = $('#modifyUserModal');
@@ -21,25 +16,32 @@ $(function () {
    const $videoInfo = $("#videoInfo");
    const $fileUploadInfo = $("#fileUploadInfo");
 
-   // FUNCTIONS =============================================================
+   // function  =============================================================
+   /** 엑세스 토큰 조회 **/
    function getJwtAccessToken() {
       return localStorage.getItem(TOKEN_ACCESS_KEY);
    }
 
+   /** 리프레쉬 토큰 조회 **/
    function getJwtRefreshToken() {
       return localStorage.getItem(TOKEN_REFRESH_KEY);
    }
 
+   /** JWT 토큰 세팅 ㅣ localStorage **/
    function setJwtToken(token) {
       localStorage.setItem(TOKEN_ACCESS_KEY, token.access_token);
       localStorage.setItem(TOKEN_REFRESH_KEY, token.refresh_token);
    }
-
+   /** JWT 토큰 제거 ㅣ localStorage **/
    function removeJwtToken() {
       localStorage.removeItem(TOKEN_ACCESS_KEY);
       localStorage.removeItem(TOKEN_REFRESH_KEY);
    }
 
+   /**
+    * 로그인 시도
+    * @param loginData
+    */
    function doLogin(loginData) {
       $.ajax({
          url: "/api/authenticate",
@@ -53,7 +55,6 @@ $(function () {
             console.log(data.access_token);
             console.log(data.refresh_token);
             $login.hide();
-            $notLoggedIn.hide();
             $registerBtn.hide();
             showUserInformation();
          },
@@ -89,11 +90,7 @@ $(function () {
           .find("#modifyUserModal").empty();
       $deleteUserModal
           .find("#deleteUserModal").empty();
-      $loggedIn
-         .hide()
-         .attr("title", "")
-         .empty();
-      $notLoggedIn.show();
+
       $modifyBtn.hide();
       $deleteBtn.hide();
       $registerBtn.show();
@@ -237,13 +234,6 @@ $(function () {
       $("#deleteUserName").val(data.username);
    }
 
-   // function showTokenInformation() {
-   //    $loggedIn
-   //       .text("Token: " + getJwtAccessToken())
-   //       .attr("title", "Token: " + getJwtAccessToken())
-   //       .show();
-   // }
-
    /**
     * 에러 내용 확인 창
     * @param statusCode
@@ -277,38 +267,6 @@ $(function () {
 
    /* 로그아웃 이벤트 */
    $("#logoutButton").click(doLogout);
-
-   // $("#exampleServiceBtn").click(function () {
-   //    $.ajax({
-   //       url: "/api/person",
-   //       type: "GET",
-   //       contentType: "application/json; charset=utf-8",
-   //       dataType: "json",
-   //       headers: createAuthorizationTokenHeader(),
-   //       success: function (data, textStatus, jqXHR) {
-   //          showResponse(jqXHR.status, JSON.stringify(data));
-   //       },
-   //       error: function (jqXHR, textStatus, errorThrown) {
-   //          showResponse(jqXHR.status, jqXHR.responseJSON.message)
-   //       }
-   //    });
-   // });
-
-   // $("#adminServiceBtn").click(function () {
-   //    $.ajax({
-   //       url: "/api/hiddenmessage",
-   //       type: "GET",
-   //       contentType: "application/json; charset=utf-8",
-   //       dataType: "json",
-   //       headers: createAuthorizationTokenHeader(),
-   //       success: function (data, textStatus, jqXHR) {
-   //          showResponse(jqXHR.status, data);
-   //       },
-   //       error: function (jqXHR, textStatus, errorThrown) {
-   //          showResponse(jqXHR.status, jqXHR.responseJSON.message)
-   //       }
-   //    });
-   // });
 
    /* 회원 등록 이벤트 */
    $("#registerUserBtn").click(function () {
@@ -445,10 +403,8 @@ $(function () {
    /** 화면 비우기 **/
    function initIndex() {
       //파일 폼 비우기기
-      // $("input[name=upload_file]").empty();
       $("#upload_file").val("");
-      // $("input[name=upload_file]")[0].files[0].clear();
-   //파일 리스트 비우기
+     //파일 리스트 비우기
       $("#responseVideoList").empty();
 
       //비디오 영역 닫기
@@ -458,11 +414,8 @@ $(function () {
       $fileUploadInfo.hide();
    }
 
-
    /*회원 등록 모달 */
    $("#registerBtn").click(function () {
-      // $("#registerModal").modal();
-
       $('#registerModal')
          .modal("show");
    });
@@ -490,15 +443,10 @@ $(function () {
       return obj;
    };
 
-
-
-
    // INITIAL CALLS =============================================================
    if (getJwtAccessToken()) {
       $login.hide();
-      $notLoggedIn.hide();
       $registerBtn.hide();
-      // showTokenInformation();
       showUserInformation();
    }
 

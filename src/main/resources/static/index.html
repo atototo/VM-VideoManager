@@ -30,10 +30,6 @@
 <div class="container">
    <h1>VM - Video Manager</h1>
 
-<!--   <div class="alert alert-danger" id="notLoggedIn">Not logged in!</div>-->
-
-<!--   <div class="alert alert-info text-hidden" id="loggedIn"></div>-->
-
    <div class="row">
       <div class="col-md-6">
          <div class="panel panel-default" id="login">
@@ -53,10 +49,10 @@
                             placeholder="password" required name="password">
                   </div>
                   <div class="well">
-                     Try one of the following logins
+                     아래의 계정 정보로 이용해주세요
                      <ul>
-                        <li>admin & admin</li>
-                        <li>user & user</li>
+                        <li>[ 관리자 권한 ]  ID : admin , PW : admin</li>
+                        <li>[ 유저 권한 ] ID : user , PW : user</li>
                      </ul>
                   </div>
                </div>
@@ -80,19 +76,9 @@
 
       <div class="col-md-6">
          <div class="btn-group" role="group" aria-label="..." style="margin-bottom: 16px;">
-<!--            <button type="button" class="btn btn-default" id="exampleServiceBtn">call example service</button>-->
-<!--            <button type="button" class="btn btn-default" id="adminServiceBtn">call admin protected service</button>-->
             <button type="button" class="btn btn-default" id="registerBtn">회원 등록</button>
             <button type="button" class="btn btn-default" id="deleteBtn" style="display: none;">회원 탈퇴</button>
             <button type="button" class="btn btn-default" id="modifyBtn" style="display: none;">내 정보 수정</button>
-         </div>
-         <div class="panel panel-default">
-            <div class="panel-heading">
-               <h3 class="panel-title">Response:</h3>
-            </div>
-            <div class="panel-body">
-               <pre id="response"></pre>
-            </div>
          </div>
          <div class="panel panel-default" id="fileUploadInfo" style="display: none;">
             <div class="panel-heading">
@@ -114,9 +100,6 @@
          </div>
          <div class="panel-body">
             <div id="videoInfoBody">
-<!--               <video id="a_video" width="320" height="240" controls="controls">-->
-<!--                  <source id="movie_src" type="video/mp4" src="" />-->
-<!--               </video>-->
                <video
                        id="my_video"
                        class="video-js"
@@ -151,6 +134,8 @@
    </div>
 </div>
 
+<!-- 모달 영영 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////--->
+
 
 <div class="modal fade" tabindex="-1" role="dialog" id="loginErrorModal">
    <div class="modal-dialog">
@@ -174,7 +159,6 @@
 <!-- 회원 등록 모달 시작 -->
 <div class="modal fade" id="registerModal" tabindex="-1" role="dialog" aria-labelledby="registerModalLabel" aria-hidden="true"  data-backdrop="static" data-keyboard="false">
    <form name="registerForm" role="form" action="/api/register" method="post">
-<!--      <input type="hidden" id="registerId">-->
       <div class="modal-dialog" role="document">
          <div class="modal-content">
             <div class="modal-header">
@@ -263,7 +247,7 @@
 <!-- 회원 탈퇴 모달 시작 -->
 <div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-labelledby="modifyUserModalLabel" aria-hidden="true"  data-backdrop="static" data-keyboard="false">
    <form name="deleteUserForm" >
-            <input type="hidden" id="deleteUserId" name="id">
+      <input type="hidden" id="deleteUserId" name="id">
       <div class="modal-dialog" role="document">
          <div class="modal-content">
             <div class="modal-header">
@@ -285,6 +269,7 @@
                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                <button type="button" class="btn btn-primary"id="deleteUserBtn">회원탈퇴</button>
             </div>
+         </div>
          </div>
       </div>
    </form>
