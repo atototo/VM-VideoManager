@@ -10,12 +10,14 @@ import com.lab.vm.common.security.jwt.TokenProvider;
 import com.lab.vm.model.domain.Authority;
 import com.lab.vm.model.domain.RefreshToken;
 import com.lab.vm.model.domain.User;
+import com.lab.vm.model.domain.Video;
 import com.lab.vm.model.dto.LoginDto;
 import com.lab.vm.model.dto.RegisterDto;
 import com.lab.vm.model.dto.TokenDto;
 import com.lab.vm.model.vo.ApiResponseMessage;
 import com.lab.vm.repository.RefreshTokenRepository;
 import com.lab.vm.repository.UserRepository;
+import com.lab.vm.repository.VideoRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 
@@ -51,6 +54,7 @@ public class UserService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RefreshTokenRepository refreshTokenRepository;
     private final TokenProvider tokenProvider;
+    private final VideoRepository videoRepository;
 
 
 
@@ -59,6 +63,12 @@ public class UserService {
 
         Optional<User> user = SecurityUtils.getCurrentUsername().
                 flatMap(userRepository::findOneWithAuthoritiesByUsername);
+
+        if(SecurityUtils.isAdminAuthority()){
+            log.info("[사용자 admin 권한 확인 ] :: {}", user.toString());
+            List<Video> videoList = videoRepository.findAll();
+            user.orElseThrow().setVideos(videoList);
+        }
         log.info("[사용자 정보 확인 ] :: {}", user.toString());
 
         return user;
