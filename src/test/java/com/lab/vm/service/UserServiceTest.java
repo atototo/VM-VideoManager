@@ -50,12 +50,8 @@ class UserServiceTest {
         Authority authority2 = new Authority();
         authority2.setName("ROLE_USER");
 
-        Authority authority3 = new Authority();
-        authority3.setName("ROLE_UPLOAD");
-
         authorityRepository.save(authority);
         authorityRepository.save(authority2);
-        authorityRepository.save(authority3);
 
     }
 

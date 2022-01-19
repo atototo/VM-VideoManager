@@ -11,6 +11,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.management.relation.Role;
 import java.util.Optional;
 
+
+/**
+ * packageName : com.lab.vm.security
+ * fileName : SecurityUtils
+ * author : yelee
+ * date : 2022-01-18
+ * description : Security 관련 공통 처리
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              yelee             최초 생성
+ */
 @Slf4j
 public class SecurityUtils {
 
@@ -56,12 +68,9 @@ public class SecurityUtils {
         //권한정보 확인 후에 사용될 로직인기 때문에 null 체크 필요 없다.
         UserDetails springSecurityUser = (UserDetails) authentication.getPrincipal();
 
-        for (GrantedAuthority authority : springSecurityUser.getAuthorities()) {
-            if (authority.toString().equals("ROLE_ADMIN")) {
-                log.info("사용자 admin 권한 확인 됨");
-                return true;
-            }
-        }
-        return false;
+        return springSecurityUser.getAuthorities()
+                .stream()
+                .map(Object::toString)
+                .anyMatch(t -> t.equals("ROLE_ADMIN"));
     }
 }

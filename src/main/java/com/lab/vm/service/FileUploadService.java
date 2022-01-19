@@ -15,11 +15,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * packageName : com.lab.vm.service
+ * fileName : FileUploadService
+ * author : yelee
+ * date : 2022-01-18
+ * description : 파일 업로드 관련 서비스
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              yelee             최초 생성
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -27,19 +35,25 @@ public class FileUploadService {
 
     @Value("${file.dir}")
     private String uploadPath;
-
-
     private final VideoRepository videoRepository;
 
 
+    /**
+     * methodName : uploadFile
+     * author : yelee
+     * description : 파일 업로드 기능
+     * @param uploadFile uploadFile
+     * @param user user
+     * @return boolean
+     * @throws IOException the io exception
+     */
     public boolean uploadFile(MultipartFile uploadFile, User user) throws IOException {
 
 
             try {
-                String fileName = generateFileName(uploadFile);
+                String fileName = generateFileName(uploadFile, user.getUsername());
                 String fullFilePath = uploadPath + File.separator + fileName;
 
-//                File tmp = new File(uploadPath + fileName);
                 log.info("[ video 경로 확인 ] : {}",fullFilePath);
                 var video = Video.builder()
                         .name(fileName)
@@ -48,19 +62,14 @@ public class FileUploadService {
                         .uploadDate(LocalDateTime.now())
                         .build();
                 log.info("[ video 이름 확인 ] : {}",video.getName());
-                //경로에 이동
 
-
-                File destdir = new File(uploadPath); //디렉토리 가져오기
-
-                if(!destdir.exists()){
-                    destdir.mkdir(); //디렉토리가 존재하지 않는다면 생성
+                File fileDir = new File(uploadPath); //디렉토리 가져오기
+                //디렉토리가 존재하는지 확인 후 없으면  생성
+                if(!fileDir.exists()){
+                    fileDir.mkdir();
                 }
 
-
-
                 Path path = Paths.get(fullFilePath).toAbsolutePath();
-
                 uploadFile.transferTo(path.toFile());
                 videoRepository.save(video);
             } catch (Exception e) {
@@ -72,9 +81,23 @@ public class FileUploadService {
 
     }
 
-    private String generateFileName(MultipartFile multipartFile) {
+    /**
+     * methodName : generateFileName
+     * author : yelee
+     * description : 파일명 generate
+     * @param multipartFile multipartFile
+     * @param userName userName
+     * @return String
+     */
+    private String generateFileName(MultipartFile multipartFile, String userName) {
         Calendar cal = Calendar.getInstance();
         Date date = cal.getTime();
-        return new SimpleDateFormat("yyyyMMdd").format(date) + "_" + multipartFile.getOriginalFilename();
+
+        return new StringJoiner("_")
+                .add(new SimpleDateFormat("yyyyMMdd").format(date) )
+                .add(userName)
+                .add(multipartFile.getOriginalFilename())
+                .toString();
     }
+
 }

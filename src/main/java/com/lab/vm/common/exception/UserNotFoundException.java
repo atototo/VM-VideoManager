@@ -1,10 +1,20 @@
 package com.lab.vm.common.exception;
 
-import org.springframework.security.core.AuthenticationException;
 
+/**
+ * packageName : com.lab.vm.common.exception
+ * fileName : UserNotFoundException
+ * author : yelee
+ * date : 2022-01-19
+ * description : 사용자 미확인 Exception
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-19              yelee             최초 생성
+ */
 public class UserNotFoundException extends RuntimeException  {
 
-    private static final long serialVersionUID = -1126699074574529145L;
+    private static final long serialVersionUID = 1L;
 
     public UserNotFoundException() {
         super();

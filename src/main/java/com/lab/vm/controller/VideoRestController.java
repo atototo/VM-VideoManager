@@ -1,11 +1,15 @@
 package com.lab.vm.controller;
 
+import com.lab.vm.common.exception.TokenValidationFailedException;
+import com.lab.vm.common.exception.UserReqFailedException;
+import com.lab.vm.common.security.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.UrlResource;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.*;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
+import java.net.URLDecoder;
 import java.util.Optional;
 
 /**
@@ -36,9 +41,10 @@ public class VideoRestController {
 
     @Value("${file.dir}")
     private String fileDir;
+    private final TokenProvider tokenProvider;
 
     @GetMapping(value = "/video/{name}")
-    public ResponseEntity<ResourceRegion> getVideo(@RequestHeader HttpHeaders headers, @PathVariable String name) throws IOException {
+    public ResponseEntity<ResourceRegion> getVideo(@RequestHeader HttpHeaders headers, @PathVariable String name, @PathVariable String token) throws IOException {
         log.info("VideoController.getVideo");
         UrlResource video = new UrlResource(fileDir+ name );
         ResourceRegion resourceRegion;
@@ -59,14 +65,30 @@ public class VideoRestController {
         return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).contentType(MediaTypeFactory.getMediaType(video).orElse(MediaType.APPLICATION_OCTET_STREAM)).body(resourceRegion);
     }
 
-    @GetMapping("/video-stream/{fileName}")
-    public StreamingResponseBody stream(HttpServletRequest req,@PathVariable String fileName) throws IOException {
-//    public StreamingResponseBody stream(HttpServletRequest req, @RequestParam("fileName") String fileName) throws IOException {
-        File file = new File(fileDir + fileName);
+    @GetMapping("/video-stream/{fileName}/token/{token}")
+//    @GetMapping("/video-stream/{fileName}")
+    public StreamingResponseBody stream(HttpServletRequest req,@PathVariable String fileName, @PathVariable String token) throws IOException {
+//    public StreamingResponseBody stream(HttpServletRequest req,@PathVariable String fileName) throws IOException {
+
+        // token 유효성 확인
+        if (!tokenProvider.validateToken(token)) {
+            throw new TokenValidationFailedException("사용자 인증정보가 만료되었습니다. 인증정보 갱신 또는 재로그인 해야합니다");
+        }
+
+
+        var isUser = tokenProvider.getAuthentication(token).getAuthorities()
+                .stream()
+                .map(Object::toString)
+                .anyMatch(t -> t.equals("ROLE_USER"));
+
+        if(!isUser) {
+            throw new UserReqFailedException("비디오 재생 권한이 없습니다.");
+        }
+        String originFileName = URLDecoder.decode(fileName, "UTF-8");
+
+        File file = new File(fileDir + originFileName);
         final InputStream is = new FileInputStream(file);
-        return os -> {
-            readAndWrite(is, os);
-        };
+        return os -> readAndWrite(is, os);
     }
 
     private void readAndWrite(final InputStream is, OutputStream os) throws IOException {

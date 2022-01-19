@@ -13,13 +13,13 @@ import java.io.IOException;
 /**
  * packageName : com.lab.vm.common.security.jwt
  * fileName : JwtAccessDeniedHandler
- * author : isbn8
+ * author : yelee
  * date : 2022-01-18
  * description : 접근 거부 핸들러
  * ===========================================================
  * DATE                  AUTHOR                  NOTE
  * -----------------------------------------------------------
- * 2022-01-18              isbn8             최초 생성
+ * 2022-01-18              yelee             최초 생성
  */
 @Component
 @Slf4j
@@ -27,9 +27,9 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
 
     /**
      * 접근 거부 핸들러
-     * @param request
-     * @param response
-     * @param accessDeniedException
+     * @param request request
+     * @param response response
+     * @param accessDeniedException accessDeniedException
      */
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException{

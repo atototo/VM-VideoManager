@@ -16,7 +16,7 @@ $(function () {
    const $response = $("#response");
    const $login = $("#login");
    const $inputUserName = $("#inputUserName");
-   const $inputUserEmail = $("#inputUserEmail");
+   const $inputPassword = $("#inputPassword");
    const $userInfo = $("#userInfo").hide();
    const $videoInfo = $("#videoInfo");
    const $fileUploadInfo = $("#fileUploadInfo");
@@ -55,19 +55,24 @@ $(function () {
             $login.hide();
             $notLoggedIn.hide();
             $registerBtn.hide();
-            showTokenInformation()
             showUserInformation();
          },
-         error: function (jqXHR, textStatus, errorThrown) {
-            if (jqXHR.status === 401) {
-               $('#loginErrorModal')
-                  .modal("show")
-                  .find(".modal-body")
-                  .empty()
-                  .html("<p>" + jqXHR.responseJSON.message + "</p>");
+         error: function (jqXHR, textStatus, errorThrown){
+
+            console.log(JSON.stringify(jqXHR))
+            console.log("tmpJson  readyState :: " +jqXHR.readyState);
+            console.log("tmpJson  status :: " +jqXHR.status);
+            console.log("tmpJson  statusText :: " +jqXHR.statusText );
+            console.log("tmpJson  message :: " +jqXHR.responseJSON.message );
+
+            if(jqXHR.status === 401){
+               alert("알 수 없는 사용자입니다");
             } else {
-               throw new Error("an unexpected error occured: " + errorThrown);
+              alert(jqXHR.responseJSON.message);
             }
+
+
+
          }
       });
    }
@@ -76,7 +81,7 @@ $(function () {
       removeJwtToken();
       $login.show();
       $inputUserName.val("");
-      $inputUserEmail.val("");
+      $inputPassword.val("");
       $userInfo
          .hide()
          .find("#userInfoBody").empty();
@@ -130,10 +135,10 @@ $(function () {
             $userInfoBody.append($("<div>").text("Email: " + data.email)).attr("onclick","showVideo();");
 
             var $authorityList = $("<ul>");
-            var userFlag = false;
+            var userFlag = true;
             data.authorities.forEach(function (authorityItem) {
                $authorityList.append($("<li>").text(authorityItem.name));
-               if(authorityItem.name ==='ROLE_UPLOAD') userFlag = true;
+               if(authorityItem.name ==='ROLE_ADMIN') userFlag = false;
             });
             console.log(userFlag);
             //권한 정보에 user 일 경우에만 파일 등록 버튼 보이도록
@@ -157,30 +162,32 @@ $(function () {
       });
    }
 
+   /**
+    * 비디오저장 목록 생성
+    * @param data
+    */
    function showVideoList(data){
-
-      // var col=document.getElementById('responseVideoList');
 
       let insertTr = ""; // 변수 선언
       data.videos.forEach(function (videoItem) {
          console.log(videoItem);
          // 동적으로 리스트 추가
          var videoId ="video_"+data.username+"_" +videoItem.id;
-         // insertTr += "<tr onclick='showVideo("+videoItem.id+", "+data.username+")' style='cursor:pointer;'>"; // body 에 남겨둔 예시처럼 데이터 삽입
-         insertTr += "<tr>"; // body 에 남겨둔 예시처럼 데이터 삽입
-         insertTr += "<td>" + videoItem.name + "</td>"; // body 에 남겨둔 예시처럼 데이터 삽입
+         insertTr += "<tr>";
+         insertTr += "<td>" + videoItem.name + "</td>";
          insertTr += "<td>" + videoItem.uploadDate+ "</td>";
          insertTr += "<td>";
          insertTr += '<button type="button" id='+videoId+'>재생</button>';
          insertTr += "</td>";
          insertTr += "</tr>";
-         //두 번째 버튼 이벤트
+
+         //이벤트 리스터 등록
          $(document).on("click", "#"+videoId, function() {
             showVideo(videoId, videoItem.name);
          });
 
       });
-      // col.innerHTML=insertTr;
+
 
       $("#responseVideoList").html(insertTr);
    }
@@ -195,27 +202,17 @@ $(function () {
       document.getElementById("a_video").play();
    }
 
+   /** 비디오 재생**/
    function showVideo(id, name) {
       $videoInfo.show();
-      videojs.Hls.xhr.beforeRequest = function(options) {
-         console.log("토큰 정보 해야대 들어와써???????");
-         options.headers = options.headers || {};
-         options.headers.Authorization = getJwtAccessToken();
-         options.uri = options.uri + "?Authorization="+getJwtAccessToken();
-         console.log('options', options)
-         return options;
-      };
-
       var player = videojs('my_video');
       player.ready(function() {
          this.src({
-            src: "/video-stream/"+name,
-            // headers: createAuthorizationTokenHeader(),
+            src: "/video-stream/"+name+"/token/"+getJwtAccessToken(),
             type : "video/mp4"
          });
 
       });
-
    }
 
    /**
@@ -230,19 +227,28 @@ $(function () {
       $("#modifyUserPhone").val(data.phone);
    }
 
+   /**
+    * 회원 탈퇴 확인 창 모달 세팅
+    * @param data
+    */
    function showDeleteUser(data){
       $("#deleteBtn").show();
       $("#deleteUserId").val(data.id);
       $("#deleteUserName").val(data.username);
    }
 
-   function showTokenInformation() {
-      $loggedIn
-         .text("Token: " + getJwtAccessToken())
-         .attr("title", "Token: " + getJwtAccessToken())
-         .show();
-   }
+   // function showTokenInformation() {
+   //    $loggedIn
+   //       .text("Token: " + getJwtAccessToken())
+   //       .attr("title", "Token: " + getJwtAccessToken())
+   //       .show();
+   // }
 
+   /**
+    * 에러 내용 확인 창
+    * @param statusCode
+    * @param message
+    */
    function showResponse(statusCode, message) {
       $response
          .empty()
@@ -255,7 +261,8 @@ $(function () {
 
 
 
-   // REGISTER EVENT LISTENERS =============================================================
+   // 클릭 이벤트 리스터 =============================================================
+   /* 로그인 이벤트 */
    $("#loginForm").submit(function (event) {
       event.preventDefault();
 
@@ -268,43 +275,42 @@ $(function () {
       doLogin(formData);
    });
 
+   /* 로그아웃 이벤트 */
    $("#logoutButton").click(doLogout);
 
-   $("#exampleServiceBtn").click(function () {
-      $.ajax({
-         url: "/api/person",
-         type: "GET",
-         contentType: "application/json; charset=utf-8",
-         dataType: "json",
-         headers: createAuthorizationTokenHeader(),
-         success: function (data, textStatus, jqXHR) {
-            showResponse(jqXHR.status, JSON.stringify(data));
-         },
-         error: function (jqXHR, textStatus, errorThrown) {
-            showResponse(jqXHR.status, jqXHR.responseJSON.message)
-         }
-      });
-   });
+   // $("#exampleServiceBtn").click(function () {
+   //    $.ajax({
+   //       url: "/api/person",
+   //       type: "GET",
+   //       contentType: "application/json; charset=utf-8",
+   //       dataType: "json",
+   //       headers: createAuthorizationTokenHeader(),
+   //       success: function (data, textStatus, jqXHR) {
+   //          showResponse(jqXHR.status, JSON.stringify(data));
+   //       },
+   //       error: function (jqXHR, textStatus, errorThrown) {
+   //          showResponse(jqXHR.status, jqXHR.responseJSON.message)
+   //       }
+   //    });
+   // });
 
-   $("#adminServiceBtn").click(function () {
-      $.ajax({
-         url: "/api/hiddenmessage",
-         type: "GET",
-         contentType: "application/json; charset=utf-8",
-         dataType: "json",
-         headers: createAuthorizationTokenHeader(),
-         success: function (data, textStatus, jqXHR) {
-            showResponse(jqXHR.status, data);
-         },
-         error: function (jqXHR, textStatus, errorThrown) {
-            showResponse(jqXHR.status, jqXHR.responseJSON.message)
-         }
-      });
-   });
+   // $("#adminServiceBtn").click(function () {
+   //    $.ajax({
+   //       url: "/api/hiddenmessage",
+   //       type: "GET",
+   //       contentType: "application/json; charset=utf-8",
+   //       dataType: "json",
+   //       headers: createAuthorizationTokenHeader(),
+   //       success: function (data, textStatus, jqXHR) {
+   //          showResponse(jqXHR.status, data);
+   //       },
+   //       error: function (jqXHR, textStatus, errorThrown) {
+   //          showResponse(jqXHR.status, jqXHR.responseJSON.message)
+   //       }
+   //    });
+   // });
 
-   /**
-    * 회원 등록 이벤트
-    */
+   /* 회원 등록 이벤트 */
    $("#registerUserBtn").click(function () {
       const data = $("form[name=registerForm]").serializeObject();
       console.log(data);
@@ -345,9 +351,7 @@ $(function () {
          .modal("show");
    });
 
-   /**
-    * 회원정보 수정 이벤트
-    */
+   /** 회원정보 수정 이벤트 **/
    $("#modifyUserBtn").click(function () {
       const data = $("form[name=modifyUserForm]").serializeObject();
       console.log(data);
@@ -378,9 +382,7 @@ $(function () {
       });
    });
 
-   /**
-    * 회원 탈퇴 이벤트
-    */
+   /** 회원 탈퇴 이벤트 **/
    $("#deleteUserBtn").click(function (){
       const data = $("form[name=deleteUserForm]").serializeObject();
       console.log(data);
@@ -416,14 +418,9 @@ $(function () {
       var formData = new FormData();
       var inputFile = $("input[name='upload_file']");
       console.log(inputFile);
-      // var file = inputFile[0].files;
-      formData.append('key1', 'value1');
-      formData.append('key2', 'value2');
 
-      // for(var i=0; i <files.length;i++) {
-         formData.append('file', $("input[name=upload_file]")[0].files[0])
+      formData.append('file', $("input[name=upload_file]")[0].files[0])
 
-      // }
       console.log(formData);
       $.ajax({
          url: "/api/file-upload",
@@ -435,6 +432,7 @@ $(function () {
          success: function (data, textStatus, jqXHR) {
             console.log(data);
             alert(data.message);
+            $("#upload_file").val("");
             showUserInformation();
          }, error: function (jqXHR, textStatus, errorThrown) {
             showResponse(jqXHR.status, jqXHR.responseJSON.message);
@@ -444,13 +442,13 @@ $(function () {
 
    })
 
-   /**
-    * 화면 비우기
-    */
+   /** 화면 비우기 **/
    function initIndex() {
       //파일 폼 비우기기
-     $("#upload_file").val("");
-     //파일 리스트 비우기
+      // $("input[name=upload_file]").empty();
+      $("#upload_file").val("");
+      // $("input[name=upload_file]")[0].files[0].clear();
+   //파일 리스트 비우기
       $("#responseVideoList").empty();
 
       //비디오 영역 닫기
@@ -459,12 +457,6 @@ $(function () {
       //파일업로드 영역 닫기
       $fileUploadInfo.hide();
    }
-
-   $loggedIn.click(function () {
-      $loggedIn
-         .toggleClass("text-hidden")
-         .toggleClass("text-shown");
-   });
 
 
    /*회원 등록 모달 */
@@ -502,12 +494,12 @@ $(function () {
 
 
    // INITIAL CALLS =============================================================
-   // if (getJwtToken()) {
-   //    $login.hide();
-   //    $notLoggedIn.hide();
-   //    $registerBtn.hide();
-   //    showTokenInformation();
-   //    showUserInformation();
-   // }
+   if (getJwtAccessToken()) {
+      $login.hide();
+      $notLoggedIn.hide();
+      $registerBtn.hide();
+      // showTokenInformation();
+      showUserInformation();
+   }
 
 });

@@ -79,12 +79,8 @@ class VideoRepositoryTest {
         Authority authority2 = new Authority();
         authority2.setName("ROLE_USER");
 
-        Authority authority3 = new Authority();
-        authority3.setName("ROLE_UPLOAD");
-
         authorityRepository.save(authority);
         authorityRepository.save(authority2);
-        authorityRepository.save(authority3);
 
         var admin = RegisterDto.builder()
 //            .activated(true)
@@ -108,16 +104,6 @@ class VideoRepositoryTest {
 
         userService.registerUser(user);
 
-        var user2  = RegisterDto.builder()
-//            .activated(true)
-                .username("user2")
-                .password("user2")
-                .passwordConfirm("user2")
-                .phone("01011114444")
-                .email("user2@user.com")
-                .build();
-
-        userService.registerUser(user2);
 
     }
 
@@ -129,8 +115,7 @@ class VideoRepositoryTest {
 
         var registerDto = userService.findUserInfoByName("user");
         var user1 = userRepository.findById(registerDto.getId());
-        var registerDto2 = userService.findUserInfoByName("user2");
-        var user2 = userRepository.findById(registerDto.getId());
+
 
         var saveVideo1 = Video.builder()
                 .id(1L)
@@ -140,16 +125,7 @@ class VideoRepositoryTest {
                 .uploadDate(LocalDateTime.now())
                 .build();
 
-        var saveVideo2 = Video.builder()
-                .id(2L)
-                .name("video2.mp4")
-                .size(1234L)
-                .user(user2.get())
-                .uploadDate(LocalDateTime.now())
-                .build();
-
         videoRepository.save(saveVideo1);
-        videoRepository.save(saveVideo2);
     }
 
 

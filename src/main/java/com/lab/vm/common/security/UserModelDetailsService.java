@@ -19,7 +19,15 @@ import java.util.Locale;
 import java.util.stream.Collectors;
 
 /**
- * Authenticate a user from the database.
+ * packageName : com.lab.vm.common.security
+ * fileName : UserModelDetailsService
+ * author : yelee
+ * date : 2022-01-18
+ * description : 예외 공통 처리
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              yelee             최초 생성
  */
 @Component("userDetailsService")
 @Slf4j
@@ -34,24 +42,18 @@ public class UserModelDetailsService implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(final String login) {
-        log.debug("Authenticating user '{}'", login);
-
-        if (new EmailValidator().isValid(login, null)) {
-            return userRepository.findOneWithAuthoritiesByEmailIgnoreCase(login)
-                    .map(user -> createSpringSecurityUser(login, user))
-                    .orElseThrow(() -> new UsernameNotFoundException("User with email " + login + " was not found in the database"));
-        }
 
         String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);
         return userRepository.findOneWithAuthoritiesByUsername(lowercaseLogin)
                 .map(user -> createSpringSecurityUser(lowercaseLogin, user))
-                .orElseThrow(() -> new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database"));
+                .orElseThrow(() -> new UsernameNotFoundException("알 수 없는 사용자 입니다."));
 
     }
 
     private org.springframework.security.core.userdetails.User createSpringSecurityUser(String lowercaseLogin, User user) {
         if (!user.isActivated()) {
-            throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
+            log.info(">>>>>>>>>>>>>> 비활성 사용자 접근 거부 ");
+            throw new UserNotActivatedException("비활성 사용자 입니다 (탈퇴)");
         }
         List<GrantedAuthority> grantedAuthorities = user.getAuthorities().stream()
                 .map(authority -> new SimpleGrantedAuthority(authority.getName()))

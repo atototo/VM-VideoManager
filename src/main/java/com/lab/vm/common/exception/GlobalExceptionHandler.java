@@ -6,6 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -16,13 +18,13 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * packageName : com.lab.vm.common.exception
  * fileName : GlobalExceptionHandler
- * author : isbn8
+ * author : yelee
  * date : 2022-01-18
  * description : 예외 공통 처리
  * ===========================================================
  * DATE                  AUTHOR                  NOTE
  * -----------------------------------------------------------
- * 2022-01-18              isbn8             최초 생성
+ * 2022-01-18              yelee             최초 생성
  */
 @Slf4j
 @RequiredArgsConstructor
@@ -119,6 +121,61 @@ public class GlobalExceptionHandler {
         ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.BAD_REQUEST, ex.getMessage());
         log.info("UserReqFailedException 발생!! {}", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+
+    /**
+     *  토큰 유효성 검사 실패 Exception
+     * @param ex
+     * @return
+     */
+   @ExceptionHandler(TokenValidationFailedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiResponseMessage> tokenValidationFailedException(TokenValidationFailedException ex) {
+        ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.BAD_REQUEST, ex.getMessage());
+        log.info("TokenValidationFailedException 발생!! {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+
+    /**
+     *  비활성 사용자 접근 Exception
+     * @param ex
+     * @return
+     */
+   @ExceptionHandler(UserNotActivatedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiResponseMessage> userNotActivatedException(UserNotActivatedException ex) {
+        ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.FORBIDDEN, ex.getMessage());
+        log.info("UserNotActivatedException 발생!! {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
+  /**
+     *  알수없는 사용자 접근 Exception
+     * @param ex
+     * @return
+     */
+   @ExceptionHandler(UsernameNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiResponseMessage> usernameNotFoundException(UsernameNotFoundException ex) {
+        ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.FORBIDDEN, ex.getMessage());
+        log.info("UsernameNotFoundException 발생!! {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
+
+  /**
+     *  알수없는 사용자 접근 Exception
+     * @param ex
+     * @return
+     */
+   @ExceptionHandler(AuthenticationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiResponseMessage> authenticationException(AuthenticationException ex) {
+        ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.FORBIDDEN, ex.getMessage());
+        log.info("AuthenticationException 발생!! {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
 

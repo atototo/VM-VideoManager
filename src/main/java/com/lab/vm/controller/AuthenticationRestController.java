@@ -25,7 +25,15 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 
 /**
- * Controller to authenticate users.
+ * packageName : com.lab.vm.controller
+ * fileName : AuthenticationRestController
+ * author : yelee
+ * date : 2022-01-18
+ * description : 로그인 진행 하면 권한 토큰 처리 진행
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              yelee             최초 생성
  */
 @RestController
 @RequestMapping("/api")
@@ -37,13 +45,14 @@ public class AuthenticationRestController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final RefreshTokenRepository refreshTokenRepository;
 
-//
-//
-//    public AuthenticationRestController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder) {
-//        this.tokenProvider = tokenProvider;
-//        this.authenticationManagerBuilder = authenticationManagerBuilder;
-//    }
 
+    /**
+     * methodName : authorize
+     * author : yelee
+     * description : 로그인 진행 및 토큰생성
+     * @param loginDto dto
+     * @return response entity
+     */
     @PostMapping("/authenticate")
     @Transactional
     public ResponseEntity<JWTToken> authorize(@Valid @RequestBody LoginDto loginDto) {
@@ -58,10 +67,6 @@ public class AuthenticationRestController {
 
         // RefreshToken 업데이트
         var refreshToken = refreshTokenRepository.findByKey(loginDto.getUsername());
-
-
-
-        // RefreshToken 없으면 저장
         if (!refreshToken.isPresent()) {
 
             log.info("[refresh token 없음 :: 새로 저장 ]");
@@ -81,21 +86,12 @@ public class AuthenticationRestController {
         }
 
         HttpHeaders httpHeaders = new HttpHeaders();
-//        httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + tokenDto.getAccessToken());
 
-        /**
-         * storage accesstoken refrestoken 두개 다 저장 시켜야 하는데 가능 여부 파악 id_token 으로 accesstoken  받는데 어떻게..?
-         */
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + tokenDto.getAccessToken());
         return new ResponseEntity<>(new JWTToken( tokenDto.getAccessToken(), tokenDto.getRefreshToken()), httpHeaders, HttpStatus.OK);
     }
 
-    /**
-     * Object to return as body in JWT Authentication.
-     */
-    /**
-     * Object to return as body in JWT Authentication.
-     */
+
     static class JWTToken {
 
         private String accessToken;

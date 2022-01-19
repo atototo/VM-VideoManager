@@ -32,13 +32,13 @@ import java.util.Optional;
 /**
  * packageName : com.lab.vm.common.controller
  * fileName : UserRestController
- * author : isbn8
+ * author : yelee
  * date : 2022-01-18
  * description : 사용자 정보 관리  REST 컨트롤러
  * ===========================================================
  * DATE                  AUTHOR                  NOTE
  * -----------------------------------------------------------
- * 2022-01-18              isbn8             최초 생성
+ * 2022-01-18              yelee             최초 생성
  */
 @RestController
 @RequestMapping("/api")
@@ -59,9 +59,6 @@ public class UserRestController {
      */
     @GetMapping("/user")
     public ResponseEntity<User> getActualUser() {
-
-
-
         return ResponseEntity.ok(userService.getUserWithAuthorities().get());
     }
 

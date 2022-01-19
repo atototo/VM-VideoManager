@@ -15,31 +15,36 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.filter.CorsFilter;
 
+/**
+ * packageName : com.lab.vm.common.config
+ * fileName : WebSecurityConfig
+ * author : yelee
+ * date : 2022-01-18
+ * description : 사큐리티 설정
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              yelee             최초 생성
+ */
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final TokenProvider tokenProvider;
-    private final CorsFilter corsFilter;
     private final JwtAuthenticationEntryPoint authenticationErrorHandler;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
     public WebSecurityConfig(
             TokenProvider tokenProvider,
-            CorsFilter corsFilter,
             JwtAuthenticationEntryPoint authenticationErrorHandler,
             JwtAccessDeniedHandler jwtAccessDeniedHandler
     ) {
         this.tokenProvider = tokenProvider;
-        this.corsFilter = corsFilter;
         this.authenticationErrorHandler = authenticationErrorHandler;
         this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
     }
 
-    // Configure BCrypt password encoder =====================================================================
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -53,7 +58,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web.ignoring()
                 .antMatchers(HttpMethod.OPTIONS, "/**")
 
-                // allow anonymous resource requests
                 .antMatchers(
                         "/",
                         "/*.html",
@@ -65,15 +69,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 );
     }
 
-    // Configure security settings ===========================================================================
+
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                // we don't need CSRF because our token is invulnerable
-                .csrf().disable()
 
-                .addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class)
+                .csrf().disable()
+                .cors().disable()
+
 
                 .exceptionHandling()
                 .authenticationEntryPoint(authenticationErrorHandler)
@@ -94,14 +98,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/api/authenticate").permitAll()
                 .antMatchers("/api/register").permitAll()
-//                .antMatchers("/video-stream/**").permitAll()
+                .antMatchers("/video-stream/**").permitAll()
                 // .antMatchers("/api/activate").permitAll()
                 // .antMatchers("/api/account/reset-password/init").permitAll()
                 // .antMatchers("/api/account/reset-password/finish").permitAll()
 
                 .antMatchers("/api/person").hasAuthority("ROLE_USER")
-                .antMatchers("/api/file-upload").hasAuthority("ROLE_UPLOAD")
-                .antMatchers("/api/hiddenmessage").hasAuthority("ROLE_ADMIN")
+                .antMatchers("/api/file-upload").hasAuthority("ROLE_USER")
 
                 .anyRequest().authenticated()
 

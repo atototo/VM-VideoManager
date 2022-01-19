@@ -17,10 +17,21 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
+
+/**
+ * packageName : com.lab.vm.controller
+ * fileName : FileRestController
+ * author : yelee
+ * date : 2022-01-18
+ * description : 파일 업로드 관련 컨트롤러
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              yelee             최초 생성
+ */
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -33,21 +44,24 @@ public class FileRestController {
     @Value("${file.dir}")
     private String fileDir;
 
+    /**
+     * methodName : uploadFiles
+     * author : yelee
+     * description : 파일 업로드 기능
+     * @param file file
+     * @return response entity
+     * @throws IOException the io exception
+     */
     @PostMapping("/file-upload")
-    public ResponseEntity<ApiResponseMessage> uploadFiles(@RequestParam MultipartFile file,  HttpServletRequest request) throws IOException {
-
-        log.info("file tostring {}", file.toString());
-        log.info("request={}", request);
-
-        log.info("multipartFile={}", file);
+    public ResponseEntity<ApiResponseMessage> uploadFiles(@RequestParam MultipartFile file) throws IOException {
 
 
-        Optional<User> user = SecurityUtils.getCurrentUsername().flatMap(userRepository::findOneWithAuthoritiesByUsername);
+        Optional<User> user = SecurityUtils.getCurrentUsername()
+                .flatMap(userRepository::findOneWithAuthoritiesByUsername);
+
         log.info("[사용자 정보 확인 ] :: {}", user.toString());
-        log.info("[사용자 권한 정보 확인 ] :: {}", user.get().getAuthorities().toString());
 
-
-        if (fileUploadService.uploadFile(file, user.get())) {
+        if (fileUploadService.uploadFile(file, user.orElseThrow())) {
 
             return ResponseEntity.ok(new ApiResponseMessage(HttpStatus.OK.value(), "파일 업로드 성공"));
         }

@@ -5,13 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * packageName : com.lab.vm.common.exception
  * fileName : UserAlreadyExistException
- * author : isbn8
+ * author : yelee
  * date : 2022-01-18
- * description :
+ * description : 회원 등록 시 이미 존재할 경우 발생하는 Exception
  * ===========================================================
  * DATE                  AUTHOR                  NOTE
  * -----------------------------------------------------------
- * 2022-01-18              isbn8             최초 생성
+ * 2022-01-18              yelee             최초 생성
  */
 @Slf4j
 public class UserAlreadyExistException extends RuntimeException {

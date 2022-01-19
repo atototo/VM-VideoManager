@@ -17,8 +17,15 @@ import java.io.IOException;
 
 
 /**
- * Filters incoming requests and installs a Spring Security principal if a header corresponding to a valid user is
- * found.
+ * packageName : com.lab.vm.security.jwt
+ * fileName : JWTFilter
+ * author : yelee
+ * date : 2022-01-18
+ * description : JWTFilter 설정
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              yelee             최초 생성
  */
 @Slf4j
 public class JWTFilter extends GenericFilterBean {

@@ -125,7 +125,6 @@ public class UserService {
             authorityHashSet.add(new Authority("ROLE_USER"));
         } else {
             authorityHashSet.add(new Authority("ROLE_USER"));
-            authorityHashSet.add(new Authority("ROLE_UPLOAD"));
         }
         user.setAuthorities(authorityHashSet);
 
@@ -195,6 +194,13 @@ public class UserService {
     }
 
 
+    /**
+     * methodName : userDelete
+     * author : yelee
+     * description : 사용자 탈퇴 요청 시 비활성화 처리
+     * @param loginDto dto
+     * @return optional
+     */
     @Transactional
     public Optional<User> userDelete(LoginDto loginDto){
         // 로그인 정보 검증 후
@@ -224,7 +230,7 @@ public class UserService {
     /**
      * chkValidateExistUser
      * 기존 회원 여부 확인
-     * @param RegisterDto registerDto
+     * @param registerDto registerDto
      */
     private void chkValidateExistUser(RegisterDto registerDto) {
 
@@ -239,7 +245,7 @@ public class UserService {
     /**
      * chkPasswordConfirm
      * 비밀번호 입력 검증
-     * @param RegisterDto registerDto
+     * @param registerDto registerDto
      */
     private void chkPasswordConfirm(RegisterDto registerDto) {
         //  비밀번호 입력 검증
@@ -251,7 +257,7 @@ public class UserService {
 
     /**
      * Is same ori pwd with enc pwd boolean.
-     *
+     * 입력된 비밀번호와 DB 비밀번호 동일 여부 확인
      * @param oriPassword the ori password
      * @param encPassword the enc password
      * @return the boolean
@@ -264,8 +270,8 @@ public class UserService {
 
     /**
      * 유저 이름으로 사용자 정보 조회
-     * @param userName
-     * @return
+     * @param userName userName
+     * @return RegisterDto
      */
     public RegisterDto findUserInfoByName(String userName) {
         return userRepository.findUserInfoByName(userName);
