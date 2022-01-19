@@ -20,7 +20,6 @@ import java.util.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-
 @SqlResultSetMapping(
         name = "register_dto",
         classes = @ConstructorResult(
@@ -28,16 +27,16 @@ import java.util.*;
                 columns = {
                         @ColumnResult(name = "id", type = Long.class),
                         @ColumnResult(name = "password", type = String.class),
-//                        @ColumnResult(name = "username", type = String.class),
-//                        @ColumnResult(name = "email", type = String.class),
-//                        @ColumnResult(name = "phone", type = String.class)
+                        @ColumnResult(name = "username", type = String.class),
+                        @ColumnResult(name = "email", type = String.class),
+                        @ColumnResult(name = "phone", type = String.class)
                 }
         )
 )
 @NamedNativeQuery(
         name = "find_user_by_name_dto",
-        query ="select m.id AS id, m.password AS password from user m where m.username = :username",
-//        query ="select m.id AS id, m.password AS password, m.username AS username,m.email AS email, m.phone AS phone from user m where m.username = :username",
+//        query ="select m.id AS id, m.password AS password from user m where m.username = :username",
+        query ="select m.id AS id, m.password AS password, m.username AS username,m.email AS email, m.phone AS phone from user m where m.username = :username",
         resultSetMapping = "register_dto"
 )
 public class User implements Serializable {
@@ -52,19 +51,13 @@ public class User implements Serializable {
     private Long id;
 
     @Column(name = "username", length = 50, unique = true)
-    @NotNull
-    @Size(min = 3, max = 50)
     private String username;
 
     @JsonIgnore
     @Column(name = "password", length = 100)
-    @NotNull
-    @Size(min = 4, max = 100)
     private String password;
 
     @Column(name = "email", length = 50)
-    @NotNull
-    @Size(min = 4, max = 50)
     private String email;
 
     @Column(name="phone")
@@ -72,7 +65,6 @@ public class User implements Serializable {
 
     @JsonIgnore
     @Column(name = "activated")
-    @NotNull
     private boolean activated;
 
     @ManyToMany

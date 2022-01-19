@@ -40,7 +40,7 @@ class AuthenticationRestControllerTest  {
 
     @Test
     @DisplayName("사용자 정보 및 토큰 정상 발행 확인")
-    public void successfulAuthenticationWithUser() throws Exception {
+    void successfulAuthenticationWithUser() throws Exception {
         getMockMvc().perform(post("/api/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"password\": \"user\", \"username\": \"user\"}"))
@@ -50,7 +50,7 @@ class AuthenticationRestControllerTest  {
 
     @Test
     @DisplayName("관리자 정보 및 토큰 정상 발행 확인")
-    public void successfulAuthenticationWithAdmin() throws Exception {
+    void successfulAuthenticationWithAdmin() throws Exception {
         getMockMvc().perform(post("/api/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"password\": \"admin\", \"username\": \"admin\"}"))
@@ -59,7 +59,7 @@ class AuthenticationRestControllerTest  {
     }
 
     @Test
-    public void unsuccessfulAuthenticationWithDisabled() throws Exception {
+    void unsuccessfulAuthenticationWithDisabled() throws Exception {
         getMockMvc().perform(post("/api/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"password\": \"password\", \"username\": \"disabled\"}"))
@@ -68,7 +68,7 @@ class AuthenticationRestControllerTest  {
     }
 
     @Test
-    public void unsuccessfulAuthenticationWithWrongPassword() throws Exception {
+    void unsuccessfulAuthenticationWithWrongPassword() throws Exception {
         getMockMvc().perform(post("/api/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"password\": \"wrong\", \"username\": \"user\"}"))
@@ -77,7 +77,7 @@ class AuthenticationRestControllerTest  {
     }
 
     @Test
-    public void unsuccessfulAuthenticationWithNotExistingUser() throws Exception {
+    void unsuccessfulAuthenticationWithNotExistingUser() throws Exception {
         getMockMvc().perform(post("/api/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"password\": \"password\", \"username\": \"not_existing\"}"))

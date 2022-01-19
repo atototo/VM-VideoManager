@@ -21,5 +21,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
 
     @Query(name="find_user_by_name_dto", nativeQuery = true)
-    Optional<RegisterDto> findUserInfoByName(@Param("username") String username);
+    RegisterDto findUserInfoByName(@Param("username") String username);
 }

@@ -1,15 +1,11 @@
 package com.lab.vm.service;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lab.vm.common.exception.PasswordConfirmFailedException;
 import com.lab.vm.common.exception.UserAlreadyExistException;
 import com.lab.vm.common.security.SecurityUtils;
-import com.lab.vm.common.security.jwt.JWTFilter;
 import com.lab.vm.common.security.jwt.TokenProvider;
-import com.lab.vm.controller.AuthenticationRestController;
 import com.lab.vm.model.domain.Authority;
-import com.lab.vm.model.domain.RefreshToken;
 import com.lab.vm.model.domain.User;
 import com.lab.vm.model.dto.RegisterDto;
 import com.lab.vm.model.dto.TokenDto;
@@ -18,9 +14,7 @@ import com.lab.vm.repository.RefreshTokenRepository;
 import com.lab.vm.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -32,6 +26,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.Optional;
 
+
+/**
+ * packageName : com.lab.vm.service
+ * fileName : UserService
+ * author : isbn8
+ * date : 2022-01-19
+ * description : 유저 관련 서비스
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-19              isbn8             최초 생성
+ */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -216,7 +222,7 @@ public class UserService {
     }
 
 
-    public Optional<RegisterDto> findUserInfoByName(String userName) {
+    public RegisterDto findUserInfoByName(String userName) {
         return userRepository.findUserInfoByName(userName);
     }
 

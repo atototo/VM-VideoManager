@@ -16,7 +16,6 @@ import java.util.Optional;
  * -----------------------------------------------------------
  * 2022-01-19              isbn8             최초 생성
  */
-
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, String> {
     Optional<RefreshToken> findByKey(String key);
 }

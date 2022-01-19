@@ -87,16 +87,16 @@ class UserServiceTest {
                 .build();
 
 
-        Optional<RegisterDto> regDto = userService.findUserInfoByName("lee");
+       RegisterDto registerDto = userService.findUserInfoByName("lee");
 
 
-        System.out.println(" [ findUserInfoByName ]  결과 UserDto : " + regDto.toString());
+        System.out.println(" [ findUserInfoByName ]  결과 UserDto : " + registerDto.toString());
 
         //then
-        assertEquals(userDto.getId(), regDto.orElseThrow().getId());
+        assertEquals(userDto.getId(), registerDto.getId());
 //        assertEquals(userDto.getEmail(), regDto.orElseThrow().getEmail());
 //        assertEquals(userDto.getPhone(), regDto.orElseThrow().getPhone());
-        assertTrue(b.matches(userDto.getPassword(), regDto.orElseThrow().getPassword()));   //비빌번호 동일 여부 논리값으로 반환
+        assertTrue(b.matches(userDto.getPassword(), registerDto.getPassword()));   //비빌번호 동일 여부 논리값으로 반환
 
     }
 

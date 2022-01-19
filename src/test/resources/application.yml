@@ -6,7 +6,7 @@ spring:
 #    driver-class-name: org.h2.Driver
 
 
- C
+
 jwt:
   header: Authorization
   # This token must be encoded using Base64 with mininum 88 Bits (you can type `echo 'secret-key'|base64` on your command line)

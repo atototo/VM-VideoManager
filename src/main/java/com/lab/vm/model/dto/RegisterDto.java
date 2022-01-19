@@ -42,4 +42,13 @@ public class RegisterDto implements Serializable {
 
     private Boolean rememberMe;
 
+
+    public RegisterDto(Long id, String password, String username, String email, String phone) {
+        this.id = id;
+        this.password = password;
+        this.username = username;
+        this.email = email;
+        this.phone = phone;
+    }
+
 }

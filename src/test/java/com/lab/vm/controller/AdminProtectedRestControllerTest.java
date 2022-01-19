@@ -9,7 +9,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,7 +31,7 @@ class AdminProtectedRestControllerTest {
 
 
     @Test
-    public void getAdminProtectedGreetingForUser() throws Exception {
+    void getAdminProtectedGreetingForUser() throws Exception {
         final String token = LogInUtils.getTokenForLogin("user", "user", getMockMvc());
 
         getMockMvc().perform(get("/api/hiddenmessage")
@@ -42,7 +41,7 @@ class AdminProtectedRestControllerTest {
     }
 
     @Test
-    public void getAdminProtectedGreetingForAdmin() throws Exception {
+    void getAdminProtectedGreetingForAdmin() throws Exception {
         final String token = LogInUtils.getTokenForLogin("admin", "admin", getMockMvc());
 
         getMockMvc().perform(get("/api/hiddenmessage")
@@ -57,7 +56,7 @@ class AdminProtectedRestControllerTest {
     }
 
     @Test
-    public void getAdminProtectedGreetingForAnonymous() throws Exception {
+    void getAdminProtectedGreetingForAnonymous() throws Exception {
         getMockMvc().perform(get("/api/hiddenmessage")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isUnauthorized());
