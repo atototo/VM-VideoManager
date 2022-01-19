@@ -8,13 +8,13 @@ import java.util.Optional;
 /**
  * packageName : com.lab.vm.repository
  * fileName : RefreshTokenRepository
- * author : isbn8
+ * author : yelee
  * date : 2022-01-19
- * description :
+ * description : refreshToken 정보 repository
  * ===========================================================
  * DATE                  AUTHOR                  NOTE
  * -----------------------------------------------------------
- * 2022-01-19              isbn8             최초 생성
+ * 2022-01-19              yelee             최초 생성
  */
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, String> {
     Optional<RefreshToken> findByKey(String key);

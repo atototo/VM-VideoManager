@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -47,35 +48,36 @@ public class FileUploadService {
      * @return boolean
      * @throws IOException the io exception
      */
+    @Transactional
     public boolean uploadFile(MultipartFile uploadFile, User user) throws IOException {
 
 
-            try {
-                String fileName = generateFileName(uploadFile, user.getUsername());
-                String fullFilePath = uploadPath + File.separator + fileName;
+        try {
+            String fileName = generateFileName(uploadFile, user.getUsername());
+            String fullFilePath = uploadPath + File.separator + fileName;
 
-                log.info("[ video 경로 확인 ] : {}",fullFilePath);
-                var video = Video.builder()
-                        .name(fileName)
-                        .size(uploadFile.getSize())
-                        .user(user)
-                        .uploadDate(LocalDateTime.now())
-                        .build();
-                log.info("[ video 이름 확인 ] : {}",video.getName());
+            log.info("[ video 경로 확인 ] : {}", fullFilePath);
+            var video = Video.builder()
+                    .name(fileName)
+                    .size(uploadFile.getSize())
+                    .user(user)
+                    .uploadDate(LocalDateTime.now())
+                    .build();
 
-                File fileDir = new File(uploadPath); //디렉토리 가져오기
-                //디렉토리가 존재하는지 확인 후 없으면  생성
-                if(!fileDir.exists()){
-                    fileDir.mkdir();
-                }
-
-                Path path = Paths.get(fullFilePath).toAbsolutePath();
-                uploadFile.transferTo(path.toFile());
-                videoRepository.save(video);
-            } catch (Exception e) {
-                log.error("Error while uploading", e);
-                return false;
+            log.info("[ video 이름 확인 ] : {}", video.getName());
+            File fileDir = new File(uploadPath); //디렉토리 가져오기
+            //디렉토리가 존재하는지 확인 후 없으면  생성
+            if (!fileDir.exists()) {
+                fileDir.mkdir();
             }
+
+            Path path = Paths.get(fullFilePath).toAbsolutePath();
+            uploadFile.transferTo(path.toFile());
+            videoRepository.save(video);
+        } catch (Exception e) {
+            log.error("Error while uploading", e);
+            return false;
+        }
 
         return true;
 

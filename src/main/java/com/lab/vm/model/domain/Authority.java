@@ -14,6 +14,18 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
 
+
+/**
+ * packageName : com.lab.vm.model.domain
+ * fileName : Authority
+ * author : yelee
+ * date : 2022-01-18
+ * description : 권한 정보 Entity
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              yelee             최초 생성
+ */
 @Entity
 @Table(name = "authority")
 @Getter

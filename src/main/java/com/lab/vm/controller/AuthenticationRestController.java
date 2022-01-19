@@ -56,27 +56,34 @@ public class AuthenticationRestController {
     @PostMapping("/authenticate")
     @Transactional
     public ResponseEntity<JWTToken> authorize(@Valid @RequestBody LoginDto loginDto) {
+        log.info("[ 사용자 로그인 진행 ]");
 
+        // 자격증명 검증용 데이터 세팅 1
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
 
+        // 자격증명 정보 데이터 세팅 2
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        // 토큰 생성 (access, refresh)
         var tokenDto = tokenProvider.createToken(authentication);
 
         // RefreshToken 업데이트
         var refreshToken = refreshTokenRepository.findByKey(loginDto.getUsername());
-        if (!refreshToken.isPresent()) {
 
+
+        // refreshToken 없었을 경우 생성
+        if (refreshToken.isEmpty()) {
             log.info("[refresh token 없음 :: 새로 저장 ]");
             var refreshNewToken = RefreshToken.builder()
                     .key(loginDto.getUsername())
                     .token(tokenDto.getRefreshToken())
                     .build();
             refreshTokenRepository.save(refreshNewToken);
+
+        //RefreshToken 있으면 업데이트
         } else {
-            //RefreshToken 있으면 업데이트
             log.info("[refresh token 있음 :: 업데이트 ]");
             refreshToken.ifPresent(selectToken -> {
                 selectToken.setToken(tokenDto.getRefreshToken());
@@ -85,8 +92,8 @@ public class AuthenticationRestController {
 
         }
 
+        // 헤더 토큰 정보 세팅 및 반환
         HttpHeaders httpHeaders = new HttpHeaders();
-
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + tokenDto.getAccessToken());
         return new ResponseEntity<>(new JWTToken( tokenDto.getAccessToken(), tokenDto.getRefreshToken()), httpHeaders, HttpStatus.OK);
     }

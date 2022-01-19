@@ -54,18 +54,20 @@ public class FileRestController {
      */
     @PostMapping("/file-upload")
     public ResponseEntity<ApiResponseMessage> uploadFiles(@RequestParam MultipartFile file) throws IOException {
-
-
+        log.info("[ 파일 업로드 진행 ]");
+        // 사용자명 가져와서 DB 사용자 정보 가져온다.
         Optional<User> user = SecurityUtils.getCurrentUsername()
                 .flatMap(userRepository::findOneWithAuthoritiesByUsername);
 
-        log.info("[사용자 정보 확인 ] :: {}", user.toString());
+        log.info("[ 파일 업로드 - 사용자 정보 확인 ] :: {}", user.toString());
 
+        //사용자 정보 있을경우 파일 업로드 진행
         if (fileUploadService.uploadFile(file, user.orElseThrow())) {
 
             return ResponseEntity.ok(new ApiResponseMessage(HttpStatus.OK.value(), "파일 업로드 성공"));
         }
 
+        // 사용자 정보 없는경우 실패 리텅
         return ResponseEntity.ok(new ApiResponseMessage(HttpStatus.INTERNAL_SERVER_ERROR.value(), "파일 업로드 실패"));
     }
 

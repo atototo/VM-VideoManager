@@ -14,13 +14,13 @@ import java.time.LocalDateTime;
 /**
  * packageName : com.lab.vm.model.domain
  * fileName : BaseTimeEntity
- * author : isbn8
+ * author : yelee
  * date : 2022-01-19
  * description :
  * ===========================================================
  * DATE                  AUTHOR                  NOTE
  * -----------------------------------------------------------
- * 2022-01-19              isbn8             최초 생성
+ * 2022-01-19              yelee             최초 생성
  */
 
 @Getter

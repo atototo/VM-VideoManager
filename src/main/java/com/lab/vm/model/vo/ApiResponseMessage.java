@@ -6,25 +6,32 @@ import lombok.Setter;
 import lombok.ToString;
 import org.springframework.http.HttpStatus;
 
+
+/**
+ * packageName : com.lab.vm.vo.ApiResponseMessage
+ * fileName : ApiResponseMessage
+ * author : yelee
+ * date : 2022-01-18
+ * description : api 응답 메세지 vo
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              yelee             최초 생성
+ */
 @Setter
 @Getter
 @ToString
 @NoArgsConstructor
 public class ApiResponseMessage {
-    // HttpStatus
+
     private int status;
-    // Http Default Message
     private String message;
-    // Error Message to USER
-//   private String errorMessage;
-//   // Error Code
-//   private String errorCode;
+
 
     public ApiResponseMessage(int status, String message) {
         this.status = status;
         this.message = message;
-//      this.errorCode = errorCode;
-//      this.errorMessage = errorMessage;
+
     }
 
     public static ApiResponseMessage of(HttpStatus httpStatus, String message) {

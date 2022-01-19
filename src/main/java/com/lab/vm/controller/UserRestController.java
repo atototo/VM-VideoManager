@@ -5,28 +5,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lab.vm.common.exception.UserReqFailedException;
 import com.lab.vm.common.security.jwt.JWTFilter;
 import com.lab.vm.common.security.jwt.TokenProvider;
-import com.lab.vm.model.domain.RefreshToken;
 import com.lab.vm.model.domain.User;
 import com.lab.vm.model.dto.LoginDto;
 import com.lab.vm.model.dto.RegisterDto;
-import com.lab.vm.model.dto.TokenDto;
 import com.lab.vm.model.vo.ApiResponseMessage;
-import com.lab.vm.repository.RefreshTokenRepository;
 import com.lab.vm.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
 import javax.validation.Valid;
-import java.util.Optional;
 
 
 /**
@@ -40,6 +31,7 @@ import java.util.Optional;
  * -----------------------------------------------------------
  * 2022-01-18              yelee             최초 생성
  */
+@Slf4j
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
@@ -59,7 +51,8 @@ public class UserRestController {
      */
     @GetMapping("/user")
     public ResponseEntity<User> getActualUser() {
-        return ResponseEntity.ok(userService.getUserWithAuthorities().get());
+        log.info("[사용자 정보 조회 진행 ]");
+        return ResponseEntity.ok(userService.getUserWithAuthorities().orElseThrow());
     }
 
     /**
@@ -71,6 +64,7 @@ public class UserRestController {
      */
     @PostMapping("/register")
     public ResponseEntity<ApiResponseMessage> registerUser(@RequestBody @Valid RegisterDto registerDto) {
+        log.info("[ 사용자 등록 진행 ]");
         return ResponseEntity.ok(userService.registerUser(registerDto));
     }
 
@@ -83,7 +77,7 @@ public class UserRestController {
      */
     @PutMapping("/modify-user")
     public ResponseEntity<JWTToken> modifyUser(@RequestBody @Valid RegisterDto registerDto){
-
+        log.info("[ 사용자 정보 수정 진행 ]");
         var tokenDto = userService.userModify(registerDto);
 
         HttpHeaders httpHeaders = new HttpHeaders();
@@ -96,24 +90,21 @@ public class UserRestController {
      * methodName : deleteUser
      * author : Young Lee
      * description : 사용자 탈퇴
-     * @param LoginDto dto
+     * @param loginDto dto
      * @return response entity
      */
     @DeleteMapping("/delete-user")
     public ResponseEntity<ApiResponseMessage> deleteUser(@RequestBody @Valid LoginDto loginDto){
-
-        var user = userService.userDelete(loginDto);
-        user.orElseThrow(
-            ()-> new UserReqFailedException("회원 탈퇴 요청 처리 중 문제가 발생하였습니다.")
-        );
+        log.info("[ 사용자 탈퇴 진행 ]");
+        // 탈퇴 처리 : 비활성화
+        var user =userService.userDelete(loginDto);
+        if(user.isEmpty()) {
+            throw new UserReqFailedException("회원 탈퇴 요청 처리 중 문제가 발생하였습니다.");
+        }
 
         return ResponseEntity.ok(new ApiResponseMessage(HttpStatus.OK.value(), "사용자 탈퇴 처리를 완료 하였습니다."));
     }
 
-
-    /**
-     * Object to return as body in JWT Authentication.
-     */
     static class JWTToken {
 
         private String accessToken;

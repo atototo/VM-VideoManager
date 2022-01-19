@@ -5,15 +5,14 @@ import lombok.*;
 /**
  * packageName : com.lab.vm.model.dto
  * fileName : TokenDto
- * author : isbn8
+ * author : yelee
  * date : 2022-01-18
- * description :
+ * description : 토큰 정보 dto
  * ===========================================================
  * DATE                  AUTHOR                  NOTE
  * -----------------------------------------------------------
- * 2022-01-18              isbn8             최초 생성
+ * 2022-01-18              yelee             최초 생성
  */
-
 @Getter
 @Setter
 @Builder

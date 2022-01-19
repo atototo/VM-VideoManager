@@ -6,34 +6,27 @@ import com.lab.vm.common.security.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.UrlResource;
-import org.springframework.core.io.support.ResourceRegion;
-import org.springframework.http.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 import java.net.URLDecoder;
-import java.util.Optional;
+import java.nio.charset.StandardCharsets;
 
 /**
  * packageName : com.lab.vm.controller
  * fileName : VideoRestController
- * author : isbn8
+ * author : yelee
  * date : 2022-01-18
  * description :
  * ===========================================================
  * DATE                  AUTHOR                  NOTE
  * -----------------------------------------------------------
- * 2022-01-18              isbn8             최초 생성
+ * 2022-01-18              yelee             최초 생성
  */
-
 @RequiredArgsConstructor
 @Controller
 @Slf4j
@@ -43,38 +36,24 @@ public class VideoRestController {
     private String fileDir;
     private final TokenProvider tokenProvider;
 
-    @GetMapping(value = "/video/{name}")
-    public ResponseEntity<ResourceRegion> getVideo(@RequestHeader HttpHeaders headers, @PathVariable String name, @PathVariable String token) throws IOException {
-        log.info("VideoController.getVideo");
-        UrlResource video = new UrlResource(fileDir+ name );
-        ResourceRegion resourceRegion;
-        final long chunkSize = 1000000L;
-        long contentLength = video.contentLength();
-        Optional<HttpRange> optional = headers.getRange().stream().findFirst();
-        HttpRange httpRange;
-        if (optional.isPresent()) {
-            httpRange = optional.get();
-            long start = httpRange.getRangeStart(contentLength);
-            long end = httpRange.getRangeEnd(contentLength);
-            long rangeLength = Long.min(chunkSize, end - start + 1);
-            resourceRegion = new ResourceRegion(video, start, rangeLength);
-        } else {
-            long rangeLength = Long.min(chunkSize, contentLength);
-            resourceRegion = new ResourceRegion(video, 0, rangeLength);
-        }
-        return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).contentType(MediaTypeFactory.getMediaType(video).orElse(MediaType.APPLICATION_OCTET_STREAM)).body(resourceRegion);
-    }
-
+    /**
+     * methodName : stream
+     * author : yelee
+     * description : 파일 스트리밍
+     * @param req req
+     * @param fileName  fileName
+     * @param token token
+     * @return streaming response body
+     * @throws IOException the io exception
+     */
     @GetMapping("/video-stream/{fileName}/token/{token}")
-//    @GetMapping("/video-stream/{fileName}")
     public StreamingResponseBody stream(HttpServletRequest req,@PathVariable String fileName, @PathVariable String token) throws IOException {
-//    public StreamingResponseBody stream(HttpServletRequest req,@PathVariable String fileName) throws IOException {
-
+        log.info("[ 비디오 스트리밍 진행 ]");
+        log.info("[ 비디오 스트리밍 진행 - 토큰 검증 ]");
         // token 유효성 확인
         if (!tokenProvider.validateToken(token)) {
             throw new TokenValidationFailedException("사용자 인증정보가 만료되었습니다. 인증정보 갱신 또는 재로그인 해야합니다");
         }
-
 
         var isUser = tokenProvider.getAuthentication(token).getAuthorities()
                 .stream()
@@ -84,8 +63,9 @@ public class VideoRestController {
         if(!isUser) {
             throw new UserReqFailedException("비디오 재생 권한이 없습니다.");
         }
-        String originFileName = URLDecoder.decode(fileName, "UTF-8");
 
+        log.info("[ 비디오 스트리밍 진행 - 권한 확인 완료 및 스트리밍 진행]");
+        String originFileName = URLDecoder.decode(fileName, StandardCharsets.UTF_8);
         File file = new File(fileDir + originFileName);
         final InputStream is = new FileInputStream(file);
         return os -> readAndWrite(is, os);

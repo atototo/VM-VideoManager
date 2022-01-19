@@ -9,6 +9,17 @@ import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
 
+/**
+ * packageName : com.lab.vm.model.dto.RegisterDto
+ * fileName : RegisterDto
+ * author : yelee
+ * date : 2022-01-18
+ * description : 회원 등록 및 수정 input 정보 dto
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              yelee             최초 생성
+ */
 @Getter
 @Setter
 @Builder

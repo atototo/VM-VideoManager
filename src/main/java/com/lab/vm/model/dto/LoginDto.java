@@ -10,7 +10,15 @@ import javax.validation.constraints.Size;
 import java.io.Serializable;
 
 /**
- * DTO for storing a user's credentials.
+ * packageName : com.lab.vm.model.dto.LoginDto
+ * fileName : LoginDto
+ * author : yelee
+ * date : 2022-01-18
+ * description : 로그인 input 정보 dto
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              yelee             최초 생성
  */
 @Getter
 @Setter

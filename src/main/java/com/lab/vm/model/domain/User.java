@@ -8,11 +8,21 @@ import lombok.*;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.*;
 
+
+/**
+ * packageName : com.lab.vm.model.domain
+ * fileName : User
+ * author : yelee
+ * date : 2022-01-18
+ * description : User 정보 Entity
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              yelee             최초 생성
+ */
 @Entity
 @Table(name = "user")
 @Getter
@@ -35,7 +45,6 @@ import java.util.*;
 )
 @NamedNativeQuery(
         name = "find_user_by_name_dto",
-//        query ="select m.id AS id, m.password AS password from user m where m.username = :username",
         query ="select m.id AS id, m.password AS password, m.username AS username,m.email AS email, m.phone AS phone from user m where m.username = :username",
         resultSetMapping = "register_dto"
 )

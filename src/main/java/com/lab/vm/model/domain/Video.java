@@ -7,6 +7,17 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+/**
+ * packageName : com.lab.vm.model.domain
+ * fileName : Video
+ * author : yelee
+ * date : 2022-01-18
+ * description : Video 정보 Entity
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-18              yelee             최초 생성
+ */
 @Entity
 @Table(name="videos")
 @Getter

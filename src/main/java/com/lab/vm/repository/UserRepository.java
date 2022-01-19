@@ -9,6 +9,18 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Optional;
 
+
+/**
+ * packageName : com.lab.vm.repository
+ * fileName : UserRepository
+ * author : yelee
+ * date : 2022-01-19
+ * description : user 정보 repository
+ * ===========================================================
+ * DATE                  AUTHOR                  NOTE
+ * -----------------------------------------------------------
+ * 2022-01-19              yelee             최초 생성
+ */
 public interface UserRepository extends JpaRepository<User, Long> {
 
     @EntityGraph(attributePaths = "authorities", type = EntityGraph.EntityGraphType.LOAD)
