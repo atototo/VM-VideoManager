@@ -1,5 +1,6 @@
 package com.lab.vm.controller;
 
+import com.lab.vm.model.domain.User;
 import com.lab.vm.model.dto.RegisterDto;
 import com.lab.vm.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
@@ -31,21 +34,39 @@ class AuthenticationRestControllerTest  {
     private UserService userService;
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         SecurityContextHolder.clearContext();
     }
     public MockMvc getMockMvc() {
         return mockMvc;
     }
 
+
+    void makeUser() {
+        var user  = RegisterDto.builder()
+//            .activated(true)
+                .username("user")
+                .password("user")
+                .passwordConfirm("user")
+                .phone("01011113333")
+                .email("user@user.com")
+                .build();
+
+        userService.registerUser(user);
+    }
+
+
     @Test
     @DisplayName("사용자 정보 및 토큰 정상 발행 확인")
     void successfulAuthenticationWithUser() throws Exception {
+        // given
+        makeUser();
+
         getMockMvc().perform(post("/api/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"password\": \"user\", \"username\": \"user\"}"))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("id_token")));
+                .andExpect(content().string(containsString("access_token")));
     }
 
     @Test
