@@ -81,28 +81,48 @@ public class AuthenticationRestController {
         }
 
         HttpHeaders httpHeaders = new HttpHeaders();
+//        httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + tokenDto.getAccessToken());
+
+        /**
+         * storage accesstoken refrestoken 두개 다 저장 시켜야 하는데 가능 여부 파악 id_token 으로 accesstoken  받는데 어떻게..?
+         */
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + tokenDto.getAccessToken());
-        return new ResponseEntity<>(new JWTToken( tokenDto.getAccessToken()), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new JWTToken( tokenDto.getAccessToken(), tokenDto.getRefreshToken()), httpHeaders, HttpStatus.OK);
     }
 
     /**
      * Object to return as body in JWT Authentication.
      */
+    /**
+     * Object to return as body in JWT Authentication.
+     */
     static class JWTToken {
 
-        private String idToken;
+        private String accessToken;
+        private String refreshToken;
 
-        JWTToken(String idToken) {
-            this.idToken = idToken;
+        JWTToken(String accessToken, String refreshToken){
+
+            this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
         }
 
-        @JsonProperty("id_token")
-        String getIdToken() {
-            return idToken;
+        @JsonProperty("access_token")
+        String getAccessToken() {
+            return accessToken;
+        }
+        @JsonProperty("refresh_token")
+        String getRefreshToken() {
+            return refreshToken;
         }
 
-        void setIdToken(String idToken) {
-            this.idToken = idToken;
+
+
+        void setAccessToken(String accessToken) {
+            this.accessToken = accessToken;
+        }
+        void setRefreshToken(String refreshToken) {
+            this.refreshToken = refreshToken;
         }
     }
 }

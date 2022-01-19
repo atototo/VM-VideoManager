@@ -19,6 +19,10 @@ public class PasswordConfirmFailedException extends RuntimeException {
 
     private static final long serialVersionUID = 1L;
 
+    public PasswordConfirmFailedException(){
+        super();
+    }
+
     public PasswordConfirmFailedException(String message) {
         super(message);
         log.error(message);

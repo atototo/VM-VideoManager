@@ -68,6 +68,58 @@ public class GlobalExceptionHandler {
         log.info("AccessDeniedException 발생!! {}", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
+   /**
+     * refresh 토큰 유효성 Exception
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(RefreshTokenException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiResponseMessage>  refreshTokenException(RefreshTokenException ex) {
+        ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.FORBIDDEN, "리프레쉬 토큰이 유효하지 않습니다.");
+        log.info("RefreshTokenException 발생!! {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+    }
+
+   /**
+     * 사용자 정보 미확인 Exception
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(UserNotFoundException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiResponseMessage>  userNotFoundException(UserNotFoundException ex) {
+        ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.BAD_REQUEST, "사용자 정보를 찾을 수가 없습니다.");
+        log.info("UserNotFoundException 발생!! {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+
+   /**
+     * 비밀번호 불일치 Exception
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler(PasswordConfirmFailedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiResponseMessage>  passwordConfirmFailedException(PasswordConfirmFailedException ex) {
+        ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.BAD_REQUEST, "비밀번호가 맞지 않습니다.");
+        log.info("PasswordConfirmFailedException 발생!! {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    /**
+     * 사용자 요청 실패 Exception
+     * @param ex
+     * @return
+     */
+   @ExceptionHandler(UserReqFailedException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ResponseEntity<ApiResponseMessage> userReqFailedException(UserReqFailedException ex) {
+        ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.BAD_REQUEST, ex.getMessage());
+        log.info("UserReqFailedException 발생!! {}", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 
 
 

@@ -2,11 +2,15 @@ package com.lab.vm.service;
 
 
 import com.lab.vm.common.exception.PasswordConfirmFailedException;
+import com.lab.vm.common.exception.RefreshTokenException;
 import com.lab.vm.common.exception.UserAlreadyExistException;
+import com.lab.vm.common.exception.UserNotFoundException;
 import com.lab.vm.common.security.SecurityUtils;
 import com.lab.vm.common.security.jwt.TokenProvider;
 import com.lab.vm.model.domain.Authority;
+import com.lab.vm.model.domain.RefreshToken;
 import com.lab.vm.model.domain.User;
+import com.lab.vm.model.dto.LoginDto;
 import com.lab.vm.model.dto.RegisterDto;
 import com.lab.vm.model.dto.TokenDto;
 import com.lab.vm.model.vo.ApiResponseMessage;
@@ -181,6 +185,32 @@ public class UserService {
     }
 
 
+    @Transactional
+    public Optional<User> userDelete(LoginDto loginDto){
+        // 로그인 정보 검증 후
+        var registerDto = findUserInfoByName(loginDto.getUsername());
+        //사용자 정보 확인 불가
+        if (registerDto == null) {
+            throw new UserNotFoundException();
+        }
+        //입력받은 비밀번호와 암호화된 비밀번호 확인
+        if (!isSameOriPwdWithEncPwd(loginDto.getPassword(), registerDto.getPassword())){
+            throw new PasswordConfirmFailedException();
+        }
+
+        // 삭제 진행 -> 활성화 false
+
+        //기존정보 조회
+        var user = userRepository.findAllByUsername(registerDto.getUsername());
+        //새로운 정보로 저장
+        user.ifPresent(selectUser ->{
+            selectUser.setActivated(false);
+            userRepository.save(selectUser);
+        });
+
+        return user;
+    }
+
     /**
      * chkValidateExistUser
      * 기존 회원 여부 확인
@@ -222,8 +252,38 @@ public class UserService {
     }
 
 
+    /**
+     * 유저 이름으로 사용자 정보 조회
+     * @param userName
+     * @return
+     */
     public RegisterDto findUserInfoByName(String userName) {
         return userRepository.findUserInfoByName(userName);
+    }
+
+    @Transactional
+    public TokenDto refreshToken(TokenDto tokenDto) {
+        // AccessToken 에서 Username (pk) 가져오기
+        String accessToken = tokenDto.getAccessToken();
+        Authentication authentication = tokenProvider.getAuthentication(accessToken);
+
+        // user pk로 유저 검색 / repo 에 저장된 Refresh Token 이 없음
+        RegisterDto registerDto =findUserInfoByName(authentication.getName());
+
+        RefreshToken refreshToken = refreshTokenRepository.findByKey(registerDto.getUsername())
+                .orElseThrow(RefreshTokenException::new);
+
+
+        // 만료된 refresh token 에러
+        if (!tokenProvider.validateToken(refreshToken.getToken())) {
+            throw new RefreshTokenException();
+        }
+
+        // AccessToken, RefreshToken 토큰 재발급, 리프레쉬 토큰 저장
+        TokenDto newCreatedToken = tokenProvider.createToken(authentication);
+        RefreshToken updateRefreshToken = refreshToken.updateToken(newCreatedToken.getRefreshToken());
+        refreshTokenRepository.save(updateRefreshToken);
+        return newCreatedToken;
     }
 
 }

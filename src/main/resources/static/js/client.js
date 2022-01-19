@@ -4,7 +4,8 @@
 
 $(function () {
    // VARIABLES =============================================================
-   const TOKEN_KEY = "jwtToken";
+   const TOKEN_ACCESS_KEY = "jwtAccessToken";
+   const TOKEN_REFRESH_KEY = "jwtRefreshToken";
    const $notLoggedIn = $("#notLoggedIn");
    const $loggedIn = $("#loggedIn").hide();
    const $registerBtn = $('#registerBtn');
@@ -21,16 +22,22 @@ $(function () {
    const $fileUploadInfo = $("#fileUploadInfo");
 
    // FUNCTIONS =============================================================
-   function getJwtToken() {
-      return localStorage.getItem(TOKEN_KEY);
+   function getJwtAccessToken() {
+      return localStorage.getItem(TOKEN_ACCESS_KEY);
+   }
+
+   function getJwtRefreshToken() {
+      return localStorage.getItem(TOKEN_REFRESH_KEY);
    }
 
    function setJwtToken(token) {
-      localStorage.setItem(TOKEN_KEY, token);
+      localStorage.setItem(TOKEN_ACCESS_KEY, token.access_token);
+      localStorage.setItem(TOKEN_REFRESH_KEY, token.refresh_token);
    }
 
    function removeJwtToken() {
-      localStorage.removeItem(TOKEN_KEY);
+      localStorage.removeItem(TOKEN_ACCESS_KEY);
+      localStorage.removeItem(TOKEN_REFRESH_KEY);
    }
 
    function doLogin(loginData) {
@@ -41,7 +48,10 @@ $(function () {
          contentType: "application/json; charset=utf-8",
          dataType: "json",
          success: function (data, textStatus, jqXHR) {
-            setJwtToken(data.id_token);
+            console.log(JSON.stringify(data));
+            setJwtToken(data);
+            console.log(data.access_token);
+            console.log(data.refresh_token);
             $login.hide();
             $notLoggedIn.hide();
             $registerBtn.hide();
@@ -87,8 +97,9 @@ $(function () {
 
    }
 
+
    function createAuthorizationTokenHeader() {
-      var token = getJwtToken();
+      var token = getJwtAccessToken();
       if (token) {
          return {"Authorization": "Bearer " + token};
       } else {
@@ -137,22 +148,7 @@ $(function () {
 
             console.log(data.videos);
             showVideoList(data);
-           //  let insertTr = ""; // 변수 선언
-           // data.videos.forEach(function (videoItem) {
-           //    console.log(videoItem);
-           //    // 동적으로 리스트 추가
-           //    var videoId ="video_"+data.username+"_" +videoItem.id;
-           //    // insertTr += "<tr onclick='showVideo("+videoItem.id+", "+data.username+")' style='cursor:pointer;'>"; // body 에 남겨둔 예시처럼 데이터 삽입
-           //    insertTr += "<tr>"; // body 에 남겨둔 예시처럼 데이터 삽입
-           //       insertTr += "<td>" + videoItem.name + "</td>"; // body 에 남겨둔 예시처럼 데이터 삽입
-           //       insertTr += "<td>" + videoItem.uploadDate+ "</td>";
-           //       insertTr += "<td>";
-           //          insertTr += '<button type="button" onclick="showVideo('+videoItem.id+');">재생</button>';
-           //       insertTr += "</td>";
-           //    insertTr += "</tr>";
-           //
-           //  });
-           //    $("#responseVideoList").html(insertTr);
+
 
             console.log("내 정보 조회 값 확인 : " + JSON.stringify(data));
             showModifyInformation(data);
@@ -186,11 +182,6 @@ $(function () {
       });
       // col.innerHTML=insertTr;
 
-
-
-
-
-
       $("#responseVideoList").html(insertTr);
    }
 
@@ -209,8 +200,8 @@ $(function () {
       videojs.Hls.xhr.beforeRequest = function(options) {
          console.log("토큰 정보 해야대 들어와써???????");
          options.headers = options.headers || {};
-         options.headers.Authorization = getJwtToken();
-         options.uri = options.uri + "?Authorization="+getJwtToken();
+         options.headers.Authorization = getJwtAccessToken();
+         options.uri = options.uri + "?Authorization="+getJwtAccessToken();
          console.log('options', options)
          return options;
       };
@@ -225,22 +216,7 @@ $(function () {
 
       });
 
-      // var
-      // video = $('#videoInfoBody video')[0];
-      // video.src = "/video-stream/"+name;
-      // video.load();
-      // video.play();
    }
-
-   $("#video_user_1").click(function () {
-      console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-   })
-
-
-   $("input[id^='video_']").click(function () {
-      console.log("테이블 로우클릭??   ")
-
-   });
 
    /**
     * 내 정보 수정 모달 데이터 세팅
@@ -262,8 +238,8 @@ $(function () {
 
    function showTokenInformation() {
       $loggedIn
-         .text("Token: " + getJwtToken())
-         .attr("title", "Token: " + getJwtToken())
+         .text("Token: " + getJwtAccessToken())
+         .attr("title", "Token: " + getJwtAccessToken())
          .show();
    }
 
@@ -386,12 +362,45 @@ $(function () {
          success: function (data, textStatus, jqXHR) {
             console.log(data);
              alert("회원 정보 수정에 성공하였습니다.");
-            setJwtToken(data.id_token);
+            setJwtToken(data);
                 $modifyUserModal
                   .modal("hide")
                   .find("#modifyUserModal").empty();
                   showUserInformation();
             }, error: function (jqXHR, textStatus, errorThrown) {
+            showResponse(jqXHR.status, jqXHR.responseJSON.message)
+            alert(jqXHR.responseJSON.message);
+            console.log(jqXHR);
+            console.log(textStatus);
+            console.log(errorThrown);
+
+         }
+      });
+   });
+
+   /**
+    * 회원 탈퇴 이벤트
+    */
+   $("#deleteUserBtn").click(function (){
+      const data = $("form[name=deleteUserForm]").serializeObject();
+      console.log(data);
+
+      $.ajax({
+         url: "/api/delete-user",
+         type: "DELETE",
+         data: JSON.stringify(data),
+         contentType: "application/json; charset=utf-8",
+         dataType: "json",
+         headers: createAuthorizationTokenHeader(),
+         success: function (data, textStatus, jqXHR) {
+            console.log(data);
+            alert(data.message);
+            setJwtToken(data);
+            $deleteUserModal
+                .modal("hide")
+                .find("#modifyUserModal").empty();
+            doLogout();
+         }, error: function (jqXHR, textStatus, errorThrown) {
             showResponse(jqXHR.status, jqXHR.responseJSON.message)
             alert(jqXHR.responseJSON.message);
             console.log(jqXHR);

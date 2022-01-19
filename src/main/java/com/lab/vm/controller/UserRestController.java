@@ -2,10 +2,12 @@ package com.lab.vm.controller;
 
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.lab.vm.common.exception.UserReqFailedException;
 import com.lab.vm.common.security.jwt.JWTFilter;
 import com.lab.vm.common.security.jwt.TokenProvider;
 import com.lab.vm.model.domain.RefreshToken;
 import com.lab.vm.model.domain.User;
+import com.lab.vm.model.dto.LoginDto;
 import com.lab.vm.model.dto.RegisterDto;
 import com.lab.vm.model.dto.TokenDto;
 import com.lab.vm.model.vo.ApiResponseMessage;
@@ -19,6 +21,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -85,7 +88,7 @@ public class UserRestController {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + tokenDto.getAccessToken());
-        return new ResponseEntity<>(new JWTToken( tokenDto.getAccessToken()), httpHeaders, HttpStatus.OK);
+        return new ResponseEntity<>(new JWTToken( tokenDto.getAccessToken(), tokenDto.getRefreshToken()), httpHeaders, HttpStatus.OK);
     }
 
 
@@ -93,31 +96,19 @@ public class UserRestController {
      * methodName : deleteUser
      * author : Young Lee
      * description : 사용자 탈퇴
-     * @param registerDto dto
+     * @param LoginDto dto
      * @return response entity
      */
-//    @DeleteMapping("/delete-user")
-//    public ResponseEntity<?> deleteUser(@RequestBody @Valid RegisterDto registerDto){
-//=
-//        ApiResponseMessage apiResponseMessage = userService.modifyUser(registerDto);
-//
-//        if (apiResponseMessage.getStatus() == HttpStatus.OK.value()) {
-//            UsernamePasswordAuthenticationToken authenticationToken =
-//                    new UsernamePasswordAuthenticationToken(registerDto.getUsername(), registerDto.getPassword());
-//
-//            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-//            SecurityContextHolder.getContext().setAuthentication(authentication);
-//
-//            boolean rememberMe = (registerDto.getRememberMe() == null) ? false : registerDto.getRememberMe();
-//            String jwt = tokenProvider.createToken(authentication, rememberMe);
-//
-//            HttpHeaders httpHeaders = new HttpHeaders();
-//            httpHeaders.add(JWTFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-//
-//            return new ResponseEntity<>(new AuthenticationRestController.JWTToken(jwt), httpHeaders, HttpStatus.OK);
-//        }
-//        return ResponseEntity.ok(apiResponseMessage);
-//    }
+    @DeleteMapping("/delete-user")
+    public ResponseEntity<ApiResponseMessage> deleteUser(@RequestBody @Valid LoginDto loginDto){
+
+        var user = userService.userDelete(loginDto);
+        user.orElseThrow(
+            ()-> new UserReqFailedException("회원 탈퇴 요청 처리 중 문제가 발생하였습니다.")
+        );
+
+        return ResponseEntity.ok(new ApiResponseMessage(HttpStatus.OK.value(), "사용자 탈퇴 처리를 완료 하였습니다."));
+    }
 
 
     /**
@@ -125,19 +116,31 @@ public class UserRestController {
      */
     static class JWTToken {
 
-        private String idToken;
+        private String accessToken;
+        private String refreshToken;
 
-        JWTToken(String idToken) {
-            this.idToken = idToken;
+        JWTToken(String accessToken, String refreshToken){
+
+            this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
         }
 
-        @JsonProperty("id_token")
-        String getIdToken() {
-            return idToken;
+        @JsonProperty("access_token")
+        String getAccessToken() {
+            return accessToken;
+        }
+        @JsonProperty("refresh_token")
+        String getRefreshToken() {
+            return refreshToken;
         }
 
-        void setIdToken(String idToken) {
-            this.idToken = idToken;
+
+
+        void setAccessToken(String accessToken) {
+            this.accessToken = accessToken;
+        }
+        void setRefreshToken(String refreshToken) {
+            this.refreshToken = refreshToken;
         }
     }
 }
