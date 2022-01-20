@@ -8,6 +8,7 @@ import com.lab.vm.common.security.jwt.TokenProvider;
 import com.lab.vm.model.domain.User;
 import com.lab.vm.model.dto.LoginDto;
 import com.lab.vm.model.dto.RegisterDto;
+import com.lab.vm.model.dto.TokenDto;
 import com.lab.vm.model.vo.ApiResponseMessage;
 import com.lab.vm.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -103,6 +104,19 @@ public class UserRestController {
         }
 
         return ResponseEntity.ok(new ApiResponseMessage(HttpStatus.OK.value(), "사용자 탈퇴 처리를 완료 하였습니다."));
+    }
+
+
+    /**
+     * methodName : reissue
+     * author : Young Lee
+     * description : 토큰 갱신 요청
+     * @param tokenDto dto
+     * @return response entity
+     */
+    @PostMapping("/reissue")
+    public ResponseEntity<TokenDto> reissue( @RequestBody TokenDto tokenDto) {
+        return ResponseEntity.status(200).body(userService.refreshToken(tokenDto));
     }
 
     static class JWTToken {

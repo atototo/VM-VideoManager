@@ -23,7 +23,7 @@ public class LogInUtils {
      * @return
      * @throws Exception
      */
-    public static String getTokenForLogin(String username, String password, MockMvc mockMvc) throws Exception {
+    public static AuthenticationResponse getTokenForLogin(String username, String password, MockMvc mockMvc) throws Exception {
         String content = mockMvc.perform(post("/api/authenticate")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{\"password\": \"" + password + "\", \"username\": \"" + username + "\"}"))
@@ -31,23 +31,36 @@ public class LogInUtils {
                 .getResponse()
                 .getContentAsString();
 
+
+
         // 생성된 데이터의 토큰 값만 매핑
         AuthenticationResponse authResponse = OBJECT_MAPPER.readValue(content, AuthenticationResponse.class);
 
-        return authResponse.getIdToken();
+        return authResponse;
     }
 
-    private static class AuthenticationResponse {
+    public static class AuthenticationResponse {
 
-        @JsonAlias("id_token")
-        private String idToken;
+        @JsonAlias("access_token")
+        private String accessToken;
 
-        public void setIdToken(String idToken) {
-            this.idToken = idToken;
+        @JsonAlias("refresh_token")
+        private String refreshToken;
+
+        public void setAccessToken(String accessToken) {
+            this.accessToken = accessToken;
+        }
+        public String getAccessToken() {
+            return accessToken;
         }
 
-        public String getIdToken() {
-            return idToken;
+        public void setRefreshToken(String refreshToken) {
+            this.refreshToken = refreshToken;
         }
+
+        public String getRefreshToken() {
+            return refreshToken;
+        }
+
     }
 }

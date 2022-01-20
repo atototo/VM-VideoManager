@@ -1,5 +1,7 @@
 package com.lab.vm.controller;
 
+import com.lab.vm.model.dto.RegisterDto;
+import com.lab.vm.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,17 +34,33 @@ class UserRestControllerTest {
         return mockMvc;
     }
 
+    @Autowired
+    private UserService userService;
+    void makeUser() {
+        var user  = RegisterDto.builder()
+//            .activated(true)
+                .username("user")
+                .password("user")
+                .passwordConfirm("user")
+                .phone("01011113333")
+                .email("user@user.com")
+                .build();
+
+        userService.registerUser(user);
+    }
 
     @Test
     @DisplayName("user 권한정보 및 토큰 정보 확인")
-    public void getActualUserForUserWithToken() throws Exception {
+     void getActualUserForUserWithToken() throws Exception {
+        makeUser();
+
         //given, when
-        final String token = getTokenForLogin("user", "user", getMockMvc());
+        final LogInUtils.AuthenticationResponse authResponse = getTokenForLogin("user", "user", getMockMvc());
 
         //then
         getMockMvc().perform(get("/api/user")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header("Authorization", "Bearer " + token))
+                .header("Authorization", "Bearer " + authResponse.getAccessToken()))
                 .andExpect(status().isOk())
                 .andExpect(content().json(
                         "{\n" +
@@ -57,7 +75,7 @@ class UserRestControllerTest {
 
     @Test
     @DisplayName("토큰 없을 경우 권한문제 발생 확인")
-    public void getActualUserForUserWithoutToken() throws Exception {
+     void getActualUserForUserWithoutToken() throws Exception {
         //given when
         // 아무것도 주어지지 않았을 경우
 

@@ -58,13 +58,13 @@ class VideoRepositoryTest {
     @Test
     @DisplayName("비디오_모든_목록을_조회한다")
     void listAllVideos() throws Exception {
-        // given 비디오 정보 2개 저장
+        // given 비디오 정보 1개 저장
         setUpVideo();
         //when
         List<Video> result = videoRepository.findAll();
         //then
 
-        assertEquals(2, result.size());
+        assertEquals(1, result.size());
     }
 
 

@@ -173,9 +173,9 @@ public class GlobalExceptionHandler {
    @ExceptionHandler(AuthenticationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<ApiResponseMessage> authenticationException(AuthenticationException ex) {
-        ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.FORBIDDEN, ex.getMessage());
+        ApiResponseMessage errorResponse = ApiResponseMessage.of(HttpStatus.UNAUTHORIZED, ex.getMessage());
         log.info("AuthenticationException 발생!! {}", ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
     }
 
 

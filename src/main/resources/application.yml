@@ -22,7 +22,7 @@ spring:
     restart:
       enabled: true
 
-# 로컬 디비 테스트 용도
+# 로컬 디비 테스트 용도 (h2db)
 #  jpa:
 #    database-platform: org.hibernate.dialect.H2Dialect
 #    hibernate:

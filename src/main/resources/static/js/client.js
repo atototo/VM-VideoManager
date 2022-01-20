@@ -66,7 +66,7 @@ $(function () {
             console.log("tmpJson  statusText :: " +jqXHR.statusText );
             console.log("tmpJson  message :: " +jqXHR.responseJSON.message );
 
-            if(jqXHR.status === 401){
+            if(jqXHR.status === 403){
                alert("알 수 없는 사용자입니다");
             } else {
               alert(jqXHR.responseJSON.message);

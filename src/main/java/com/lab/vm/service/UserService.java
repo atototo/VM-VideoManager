@@ -146,7 +146,6 @@ public class UserService {
      */
     @Transactional
     public TokenDto userModify(RegisterDto registerDto){
-
         //비밀번호 재확인 검증
         chkPasswordConfirm(registerDto);
 
@@ -176,6 +175,7 @@ public class UserService {
      * @return the token dto
      */
     public TokenDto updateUserToken(String username, String password) {
+       // context 사용자 권한 정보 조회
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(username, password);
 
