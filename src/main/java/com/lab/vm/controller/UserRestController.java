@@ -10,6 +10,7 @@ import com.lab.vm.model.dto.LoginDto;
 import com.lab.vm.model.dto.RegisterDto;
 import com.lab.vm.model.dto.TokenDto;
 import com.lab.vm.model.vo.ApiResponseMessage;
+import com.lab.vm.service.AuthenticationService;
 import com.lab.vm.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 
@@ -39,9 +41,21 @@ import javax.validation.Valid;
 public class UserRestController {
 
     private final UserService userService;
-    private final TokenProvider tokenProvider;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final AuthenticationService authenticationService;
 
+    /**
+     * methodName : authorize
+     * author : yelee
+     * description : 로그인 진행 및 토큰생성
+     * @param loginDto dto
+     * @return response entity
+     */
+    @PostMapping("/authenticate")
+    @Transactional
+    public ResponseEntity<JWTToken> authorize(@Valid @RequestBody LoginDto loginDto) {
+        log.info("[ 사용자 로그인 진행 ]");
+        return authenticationService.checkAuthorize(loginDto);
+    }
 
 
     /**
