@@ -9,33 +9,33 @@ spring:
       INDENT_OUTPUT: true
 
 #   maria db
-  jpa:
-    hibernate:
-      ddl-auto: none
-  datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://34.64.196.39:3306/video-manage?characterEncoding=UTF-8&serverTimezone=UTC;MVCC=TRUE
-    username: root
-    password: 1234
-
-  devtools:
-    restart:
-      enabled: true
+#  jpa:
+#    hibernate:
+#      ddl-auto: none
+#  datasource:
+#    driver-class-name: org.mariadb.jdbc.Driver
+#    url: jdbc:mariadb://34.64.196.39:3306/video-manage?characterEncoding=UTF-8&serverTimezone=UTC;MVCC=TRUE
+#    username: root
+#    password: 1234
+#
+#  devtools:
+#    restart:
+#      enabled: true
 
 # 로컬 디비 테스트 용도 (h2db)
-#  jpa:
-#    database-platform: org.hibernate.dialect.H2Dialect
-#    hibernate:
-#      ddl-auto: create
-#  h2:
-#    console:
-#      enabled: true
-#  datasource:
-#    hikari:
-#      jdbc-url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-#      driver-class-name: org.h2.Driver
-#      username: sa
-#      password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create
+  h2:
+    console:
+      enabled: true
+  datasource:
+    hikari:
+      jdbc-url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+      driver-class-name: org.h2.Driver
+      username: sa
+      password:
 
 
   servlet:

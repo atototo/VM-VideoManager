@@ -1,9 +1,9 @@
 package com.lab.vm.controller;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.lab.vm.common.exception.UserReqFailedException;
 import com.lab.vm.common.security.jwt.JWTFilter;
+import com.lab.vm.common.security.jwt.JWTToken;
 import com.lab.vm.common.security.jwt.TokenProvider;
 import com.lab.vm.model.domain.User;
 import com.lab.vm.model.dto.LoginDto;
@@ -119,33 +119,4 @@ public class UserRestController {
         return ResponseEntity.status(200).body(userService.refreshToken(tokenDto));
     }
 
-    static class JWTToken {
-
-        private String accessToken;
-        private String refreshToken;
-
-        JWTToken(String accessToken, String refreshToken){
-
-            this.accessToken = accessToken;
-            this.refreshToken = refreshToken;
-        }
-
-        @JsonProperty("access_token")
-        String getAccessToken() {
-            return accessToken;
-        }
-        @JsonProperty("refresh_token")
-        String getRefreshToken() {
-            return refreshToken;
-        }
-
-
-
-        void setAccessToken(String accessToken) {
-            this.accessToken = accessToken;
-        }
-        void setRefreshToken(String refreshToken) {
-            this.refreshToken = refreshToken;
-        }
-    }
 }

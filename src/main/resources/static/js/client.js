@@ -444,10 +444,10 @@ $(function () {
    };
 
    // INITIAL CALLS =============================================================
-   if (getJwtAccessToken()) {
-      $login.hide();
-      $registerBtn.hide();
-      showUserInformation();
-   }
+   // if (getJwtAccessToken()) {
+   //    $login.hide();
+   //    $registerBtn.hide();
+   //    showUserInformation();
+   // }
 
 });
