@@ -62,3 +62,6 @@ logging:
 #    org.springframework.security: DEBUG
 file:
   dir: C:/upload/
+
+thymeleaf:
+  cache: false
